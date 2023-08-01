@@ -16,5 +16,5 @@ else you shoud download it from the https://www.python.org/downloads/ link
 ## contact me
 if you find any errors in the program or you have any ideas contact me on:
 
-*binsabbah2013@gmail.com email
-*+967770266408 whatsapp
+* binsabbah2013@gmail.com email
+* +967770266408 whatsapp
