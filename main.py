@@ -574,12 +574,12 @@ def About():
 
 def change_BackGround():
     them_()
-    a=msg.showinfo('Take it easy','You can ching the them \nby pressing down the xo plan')
+    #a=msg.showinfo('Take it easy','You can change the them \nby pressing down the xo plan')
 
 #=======The main game program======#
 x1= Tk()
 x1.title('X/O')
-x1.iconphoto(False, PhotoImage(file="assets/icons/icon.png"))
+#x1.iconphoto(False, PhotoImage(file="assets/icons/icon.png"))
 #x1.iconbitmap("assets/icons/icon.ico")
 x1.resizable(0,0)
 menu_bar=Menu(x1)
