@@ -579,6 +579,8 @@ def change_BackGround():
 #=======The main game program======#
 x1= Tk()
 x1.title('X/O')
+x1.iconphoto(False, PhotoImage(file="assets/icons/icon.png"))
+#x1.iconbitmap("assets/icons/icon.ico")
 x1.resizable(0,0)
 menu_bar=Menu(x1)
 x1.configure(menu=menu_bar)
