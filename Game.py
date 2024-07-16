@@ -17,6 +17,7 @@ class XO:
         self.btn=PlayBtn(self.game,'Play with Friend')
         self.btn_1=PlayBtn(self.game,'Play with computer')
         self.btn_2=PlayBtn(self.game,'Score')
+        self.c=Canvas(self.game,height=300,width=600,background='cyan').pack()
         
     
     def start(self):
