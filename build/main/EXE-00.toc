@@ -1,5 +1,5 @@
 ('D:\\repos\\XO_Game\\build\\main\\main.exe',
- True,
+ False,
  False,
  True,
  ['D:\\repos\\XO_Game\\icon.ico'],
@@ -60,8 +60,8 @@
  [],
  False,
  False,
- 1722782360,
- [('run.exe',
-   'C:\\Users\\INFOSOFT-2\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
+ 1722787737,
+ [('runw.exe',
+   'C:\\Users\\INFOSOFT-2\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\runw.exe',
    'EXECUTABLE')],
  'C:\\Users\\INFOSOFT-2\\AppData\\Local\\Programs\\Python\\Python312\\python312.dll')
