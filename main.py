@@ -1,6 +1,8 @@
 from tkinter import*
 from random import*
 from time import sleep
+from os import path
+
 import webbrowser
 
 from tkinter import messagebox as msg
@@ -579,7 +581,8 @@ def change_BackGround():
 #=======The main game program======#
 x1= Tk()
 x1.title('X/O')
-#x1.iconphoto(False, PhotoImage(file="assets/icons/icon.png"))
+path_to_img = path.abspath(path.join(path.dirname(__file__), 'icon.png'))
+x1.iconphoto(False, PhotoImage(file=path_to_img))
 #x1.iconbitmap("assets/icons/icon.ico")
 x1.resizable(0,0)
 menu_bar=Menu(x1)
