@@ -21,7 +21,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='XO',
+    name='main',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -32,6 +32,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['icon.ico'],
 )
 coll = COLLECT(
     exe,

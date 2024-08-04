@@ -1,4 +1,4 @@
-([('XO.exe', 'D:\\repos\\XO_Game\\build\\main\\XO.exe', 'EXECUTABLE'),
+([('main.exe', 'D:\\repos\\XO_Game\\build\\main\\main.exe', 'EXECUTABLE'),
   ('python312.dll',
    'C:\\Users\\INFOSOFT-2\\AppData\\Local\\Programs\\Python\\Python312\\python312.dll',
    'BINARY'),
