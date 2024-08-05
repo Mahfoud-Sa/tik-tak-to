@@ -10,8 +10,7 @@
 '
 
 ## how to install it:
-if you have the python interprenter just run it from any console 
-else you shoud download it from the https://www.python.org/downloads/ link
+just download the game from the releses tab in github
 
 ## contact me
 if you find any errors in the program or you have any ideas contact me on:
