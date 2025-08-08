@@ -4,35 +4,22 @@ import webbrowser
 from tkinter import messagebox as msg
 import os
 from os import path
+from config import *
 
 # Global game state variables
 drawing_counter = 0
-current_player = 0  # 0 = O, 1 = X
+current_player = PLAYER_O  # 0 = O, 1 = X
 x_wins = 0
 o_wins = 0
 moves_count = 0
-current_theme_index = 1
+current_theme_index = DEFAULT_THEME_INDEX
 computer_selected = 0
-
-# Color themes (background, grid)
-color_themes = [
-    ('cyan', 'gray'),
-    ('gray', 'cyan'),
-    ('gray', 'orange'),
-    ('orange', 'gray'),
-    ('orange', 'green'),
-    ('green', 'orange'),
-    ('gray', 'brown'),
-    ('brown', 'gray'),
-    ('purple', 'gray'),
-    ('gray', 'purple')
-]
 
 # Game board (3x3 grid)
 game_board = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0]
+    [EMPTY_CELL, EMPTY_CELL, EMPTY_CELL],
+    [EMPTY_CELL, EMPTY_CELL, EMPTY_CELL],
+    [EMPTY_CELL, EMPTY_CELL, EMPTY_CELL]
 ]
 
 def handle_two_players_click(event=1):
@@ -49,7 +36,7 @@ def handle_click_based_on_mode(event=1):
         player_o_radio.select()
         on_board_click_player_o(event)
     else:
-        root.after(300, computer_play)
+        root.after(COMPUTER_MOVE_DELAY, computer_play)
 
 def computer_try_win_or_block():
     """Computer AI: Try to win or block player's win"""
@@ -60,43 +47,43 @@ def computer_try_win_or_block():
 def try_win(symbol):
     """Try to find winning move for given symbol"""
     # Horizontal checks
-    for row in range(3):
-        if game_board[row][0] == symbol and game_board[row][1] == symbol and game_board[row][2] == 0:
+    for row in range(BOARD_SIZE):
+        if game_board[row][0] == symbol and game_board[row][1] == symbol and game_board[row][2] == EMPTY_CELL:
             computer_draw_x(row, 2)
             return True
-        if game_board[row][1] == symbol and game_board[row][2] == symbol and game_board[row][0] == 0:
+        if game_board[row][1] == symbol and game_board[row][2] == symbol and game_board[row][0] == EMPTY_CELL:
             computer_draw_x(row, 0)
             return True
-        if game_board[row][0] == symbol and game_board[row][2] == symbol and game_board[row][1] == 0:
+        if game_board[row][0] == symbol and game_board[row][2] == symbol and game_board[row][1] == EMPTY_CELL:
             computer_draw_x(row, 1)
             return True
     
     # Vertical checks
-    for col in range(3):
-        if game_board[0][col] == symbol and game_board[1][col] == symbol and game_board[2][col] == 0:
+    for col in range(BOARD_SIZE):
+        if game_board[0][col] == symbol and game_board[1][col] == symbol and game_board[2][col] == EMPTY_CELL:
             computer_draw_x(2, col)
             return True
-        if game_board[1][col] == symbol and game_board[2][col] == symbol and game_board[0][col] == 0:
+        if game_board[1][col] == symbol and game_board[2][col] == symbol and game_board[0][col] == EMPTY_CELL:
             computer_draw_x(0, col)
             return True
-        if game_board[0][col] == symbol and game_board[2][col] == symbol and game_board[1][col] == 0:
+        if game_board[0][col] == symbol and game_board[2][col] == symbol and game_board[1][col] == EMPTY_CELL:
             computer_draw_x(1, col)
             return True
     
     # Diagonal checks
-    if game_board[0][0] == symbol and game_board[1][1] == symbol and game_board[2][2] == 0:
+    if game_board[0][0] == symbol and game_board[1][1] == symbol and game_board[2][2] == EMPTY_CELL:
         computer_draw_x(2, 2)
         return True
-    if game_board[2][2] == symbol and game_board[1][1] == symbol and game_board[0][0] == 0:
+    if game_board[2][2] == symbol and game_board[1][1] == symbol and game_board[0][0] == EMPTY_CELL:
         computer_draw_x(0, 0)
         return True
-    if game_board[2][2] == symbol and game_board[0][0] == symbol and game_board[1][1] == 0:
+    if game_board[2][2] == symbol and game_board[0][0] == symbol and game_board[1][1] == EMPTY_CELL:
         computer_draw_x(1, 1)
         return True
-    if game_board[0][2] == symbol and game_board[1][1] == symbol and game_board[2][0] == 0:
+    if game_board[0][2] == symbol and game_board[1][1] == symbol and game_board[2][0] == EMPTY_CELL:
         computer_draw_x(2, 0)
         return True
-    if game_board[2][0] == symbol and game_board[1][1] == symbol and game_board[0][2] == 0:
+    if game_board[2][0] == symbol and game_board[1][1] == symbol and game_board[0][2] == EMPTY_CELL:
         computer_draw_x(0, 2)
         return True
     
@@ -111,16 +98,15 @@ def make_random_move():
     global game_board, game_canvas
     
     # Prefer corners if available
-    corners = [(0, 0), (0, 2), (2, 0), (2, 2)]
-    for row, col in corners:
-        if game_board[row][col] == 0:
+    for row, col in CORNER_POSITIONS:
+        if game_board[row][col] == EMPTY_CELL:
             computer_draw_x(row, col)
             return True
     
     # Otherwise random move
     while True:
-        row, col = randrange(3), randrange(3)
-        if game_board[row][col] == 0:
+        row, col = randrange(BOARD_SIZE), randrange(BOARD_SIZE)
+        if game_board[row][col] == EMPTY_CELL:
             computer_draw_x(row, col)
             return True
 
@@ -135,10 +121,10 @@ def computer_play(event=1):
 def change_theme(event=1):
     """Change the game theme randomly"""
     global current_theme_index
-    current_theme_index = randrange(10)
-    draw_grid(color_themes[current_theme_index][1])
-    drawing_canvas.configure(background=color_themes[current_theme_index][1])
-    game_canvas.configure(background=color_themes[current_theme_index][0])
+    current_theme_index = randrange(NUM_THEMES)
+    draw_grid(COLOR_THEMES[current_theme_index][1])
+    drawing_canvas.configure(background=COLOR_THEMES[current_theme_index][1])
+    game_canvas.configure(background=COLOR_THEMES[current_theme_index][0])
 
 def update_starting_player():
     """Update starting player based on radio button selection"""
@@ -152,7 +138,7 @@ def update_starting_player():
 def reset_board_canvas():
     """Reset the game board canvas"""
     game_canvas.delete("all")
-    draw_grid(color_themes[current_theme_index][1])
+    draw_grid(COLOR_THEMES[current_theme_index][1])
 
 def check_win_or_draw():
     """Check if game is won or drawn"""
@@ -161,11 +147,11 @@ def check_win_or_draw():
     moves_count += 1
     
     # Check for O win
-    if check_win('o'):
+    if check_win(SYMBOL_O):
         o_wins += 1
         o_wins_label.configure(text=f"O\n{o_wins}")
-        game_canvas.after(1000, reset_board_canvas)
-        current_player = 0
+        game_canvas.after(O_WIN_DELAY, reset_board_canvas)
+        current_player = PLAYER_O
         moves_count = 0
         player_o_radio.select()
         reset_board()
@@ -173,11 +159,11 @@ def check_win_or_draw():
         return
     
     # Check for X win
-    if check_win('x'):
+    if check_win(SYMBOL_X):
         x_wins += 1
         x_wins_label.configure(text=f"X\n{x_wins}")
-        game_canvas.after(600, reset_board_canvas)
-        current_player = 1
+        game_canvas.after(X_WIN_DELAY, reset_board_canvas)
+        current_player = PLAYER_X
         moves_count = 0
         reset_board()
         player_x_radio.select()
@@ -185,9 +171,9 @@ def check_win_or_draw():
         return
     
     # Check for draw
-    if moves_count == 9:
-        game_canvas.after(600, reset_board_canvas)
-        current_player = 0
+    if moves_count == MAX_MOVES:
+        game_canvas.after(X_WIN_DELAY, reset_board_canvas)
+        current_player = PLAYER_O
         moves_count = 0
         reset_board()
         update_score_display()
@@ -195,12 +181,12 @@ def check_win_or_draw():
 def check_win(symbol):
     """Check if player has won with given symbol"""
     # Horizontal wins
-    for row in range(3):
+    for row in range(BOARD_SIZE):
         if game_board[row][0] == symbol and game_board[row][1] == symbol and game_board[row][2] == symbol:
             return True
     
     # Vertical wins
-    for col in range(3):
+    for col in range(BOARD_SIZE):
         if game_board[0][col] == symbol and game_board[1][col] == symbol and game_board[2][col] == symbol:
             return True
     
@@ -221,29 +207,29 @@ def on_drawing_canvas_click(event):
     global drawing_counter, current_theme_index
     
     color = get_random_color()
-    radius = randrange(1, 40, 10)
+    radius = randrange(MIN_RADIUS, MAX_RADIUS, RADIUS_STEP)
     
-    if event.y > 250:  # Change background
+    if event.y > THEME_CHANGE_Y_THRESHOLD:  # Change background
         drawing_canvas.configure(background=color)
     else:
         if drawing_counter % 2 == 0:
             drawing_canvas.create_oval(
                 event.x - radius, event.y - radius,
                 event.x + radius, event.y + radius,
-                width=randrange(15, 30, 5),
+                width=randrange(MIN_WIDTH, MAX_WIDTH, WIDTH_STEP),
                 outline=color
             )
         else:
             drawing_canvas.create_line(
                 event.x + radius, event.y - radius,
                 event.x - radius, event.y + radius,
-                width=randrange(15, 30, 5),
+                width=randrange(MIN_WIDTH, MAX_WIDTH, WIDTH_STEP),
                 fill=color
             )
             drawing_canvas.create_line(
                 event.x - radius, event.y - radius,
                 event.x + radius, event.y + radius,
-                width=randrange(15, 30, 5),
+                width=randrange(MIN_WIDTH, MAX_WIDTH, WIDTH_STEP),
                 fill=color
             )
     
@@ -254,19 +240,19 @@ def exit_game():
     global drawing_counter, current_player, x_wins, o_wins, game_board
     
     drawing_counter = 0
-    current_player = 0
+    current_player = PLAYER_O
     x_wins = 0
     o_wins = 0
-    game_board = [[0,0,0], [0,0,0], [0,0,0]]
+    game_board = [[EMPTY_CELL,EMPTY_CELL,EMPTY_CELL], [EMPTY_CELL,EMPTY_CELL,EMPTY_CELL], [EMPTY_CELL,EMPTY_CELL,EMPTY_CELL]]
     
-    o_wins_label.configure(text="O\n0", background='cyan')
-    x_wins_label.configure(text="X\n0", background='cyan')
+    o_wins_label.configure(text="O\n0", background=DEFAULT_BACKGROUND)
+    x_wins_label.configure(text="X\n0", background=DEFAULT_BACKGROUND)
     
-    game_canvas.configure(height=30, width=600)
-    drawing_canvas.configure(height=300, width=600)
+    game_canvas.configure(height=GAME_CANVAS_HEIGHT, width=CANVAS_WIDTH)
+    drawing_canvas.configure(height=DRAWING_CANVAS_HEIGHT, width=CANVAS_WIDTH)
     
-    draw_random_shapes(20)
-    play_button.configure(command=start_game, text='Play')
+    draw_random_shapes(INITIAL_SHAPES_COUNT)
+    play_button.configure(command=start_game, text=PLAY_BUTTON_TEXT)
     game_canvas.delete("all")
     
     # Clean up UI elements
@@ -282,129 +268,127 @@ def start_game():
     
     game_canvas.bind("<Button-1>", handle_two_players_click)
     moves_count = 0
-    play_button.configure(command=exit_game, text='Exit')
+    play_button.configure(command=exit_game, text=EXIT_BUTTON_TEXT)
     game_canvas.delete("all")
-    drawing_canvas.configure(height=30, width=600)
-    game_canvas.configure(height=300, width=600)
+    drawing_canvas.configure(height=GAME_CANVAS_HEIGHT, width=CANVAS_WIDTH)
+    game_canvas.configure(height=DRAWING_CANVAS_HEIGHT, width=CANVAS_WIDTH)
     drawing_canvas.delete("all")
-    root.after(40, setup_game_ui)
-    draw_grid(color_themes[current_theme_index][1])
-    current_player = 0
+    root.after(UI_SETUP_DELAY, setup_game_ui)
+    draw_grid(COLOR_THEMES[current_theme_index][1])
+    current_player = PLAYER_O
 
 def get_random_color():
     """Get a random color for drawing"""
-    colors = ['cyan', 'green', 'brown', 'gray', 'dark gray', 'orange', 'purple']
-    return colors[randrange(len(colors))]
+    return DRAWING_COLORS[randrange(len(DRAWING_COLORS))]
 
 def get_random_xo_color():
     """Get random color for X/O symbols"""
-    colors = ['dark grey', 'red', 'black', 'yellow', 'white', 'blue']
-    return colors[randrange(len(colors))]
+    return SYMBOL_COLORS[randrange(len(SYMBOL_COLORS))]
 
 def draw_x(event, canvas):
     """Draw X symbol on canvas"""
     player_x_radio.select()
     color = get_random_xo_color()
     canvas.create_line(
-        event.x + 15, event.y - 15,
-        event.x - 15, event.y + 15,
-        width=20, fill=color
+        event.x + SYMBOL_RADIUS, event.y - SYMBOL_RADIUS,
+        event.x - SYMBOL_RADIUS, event.y + SYMBOL_RADIUS,
+        width=X_LINE_WIDTH, fill=color
     )
     canvas.create_line(
-        event.x - 15, event.y - 15,
-        event.x + 15, event.y + 15,
-        width=20, fill=color
+        event.x - SYMBOL_RADIUS, event.y - SYMBOL_RADIUS,
+        event.x + SYMBOL_RADIUS, event.y + SYMBOL_RADIUS,
+        width=X_LINE_WIDTH, fill=color
     )
 
 def draw_o(event, canvas):
     """Draw O symbol on canvas"""
     player_o_radio.select()
     canvas.create_oval(
-        event.x - 15, event.y - 15,
-        event.x + 15, event.y + 15,
-        width=10, outline=get_random_xo_color()
+        event.x - SYMBOL_RADIUS, event.y - SYMBOL_RADIUS,
+        event.x + SYMBOL_RADIUS, event.y + SYMBOL_RADIUS,
+        width=O_LINE_WIDTH, outline=get_random_xo_color()
     )
 
 def draw_random_shapes(count):
     """Draw random shapes on drawing canvas"""
     for _ in range(count):
-        x, y, r = randrange(10, 600), randrange(10, 600), randrange(1, 40, 10)
+        x, y, r = randrange(MIN_POSITION, MAX_POSITION), randrange(MIN_POSITION, MAX_POSITION), randrange(MIN_RADIUS, MAX_RADIUS, RADIUS_STEP)
         drawing_canvas.create_oval(
             x - r, y - r,
             x + r, y + r,
-            width=randrange(15, 30, 5),
+            width=randrange(MIN_WIDTH, MAX_WIDTH, WIDTH_STEP),
             outline=get_random_color()
         )
         
-        x, y, r = randrange(10, 600), randrange(10, 600), randrange(40)
+        x, y, r = randrange(MIN_POSITION, MAX_POSITION), randrange(MIN_POSITION, MAX_POSITION), randrange(MAX_RADIUS)
         drawing_canvas.create_line(
             x + r, y - r,
             x - r, y + r,
-            width=randrange(15, 30, 5),
+            width=randrange(MIN_WIDTH, MAX_WIDTH, WIDTH_STEP),
             fill=get_random_color()
         )
         drawing_canvas.create_line(
             x - r, y - r,
             x + r, y + r,
-            width=randrange(15, 30, 5),
+            width=randrange(MIN_WIDTH, MAX_WIDTH, WIDTH_STEP),
             fill=get_random_color()
         )
 
 def draw_grid(color):
     """Draw the game grid"""
-    game_canvas.create_line(250, 30, 250, 240, width=5, fill=color)
-    game_canvas.create_line(350, 30, 350, 240, width=5, fill=color)
-    game_canvas.create_line(170, 90, 450, 90, width=5, fill=color)
-    game_canvas.create_line(170, 170, 450, 170, width=5, fill=color)
+    game_canvas.create_line(GRID_VERTICAL_LEFT, GRID_START_Y, GRID_VERTICAL_LEFT, GRID_END_Y, width=GRID_LINE_WIDTH, fill=color)
+    game_canvas.create_line(GRID_VERTICAL_RIGHT, GRID_START_Y, GRID_VERTICAL_RIGHT, GRID_END_Y, width=GRID_LINE_WIDTH, fill=color)
+    game_canvas.create_line(GRID_START_X, GRID_HORIZONTAL_TOP, GRID_END_X, GRID_HORIZONTAL_TOP, width=GRID_LINE_WIDTH, fill=color)
+    game_canvas.create_line(GRID_START_X, GRID_HORIZONTAL_BOTTOM, GRID_END_X, GRID_HORIZONTAL_BOTTOM, width=GRID_LINE_WIDTH, fill=color)
 
 def computer_draw_x(row, col):
     """Draw X for computer move"""
     color = get_random_xo_color()
-    x = (col * 100) + 200
-    y = 30 + (row * 100)
+    x = (col * CELL_SIZE) + CELL_OFFSET_X
+    y = CELL_OFFSET_Y + (row * CELL_SIZE)
     
-    game_canvas.create_line(x + 15, y - 15, x - 15, y + 15, width=20, fill=color)
-    game_canvas.create_line(x - 15, y - 15, x + 15, y + 15, width=20, fill=color)
-    game_board[row][col] = 'x'
+    game_canvas.create_line(x + SYMBOL_RADIUS, y - SYMBOL_RADIUS, x - SYMBOL_RADIUS, y + SYMBOL_RADIUS, width=X_LINE_WIDTH, fill=color)
+    game_canvas.create_line(x - SYMBOL_RADIUS, y - SYMBOL_RADIUS, x + SYMBOL_RADIUS, y + SYMBOL_RADIUS, width=X_LINE_WIDTH, fill=color)
+    game_board[row][col] = SYMBOL_X
 
 def on_board_click_player_o(event):
     """Handle board click for player O"""
     global game_board, current_player
     
     # Change theme if grid line clicked
-    if (event.y > 250 or 
-        248 < event.x < 253 or 
-        347 < event.x < 352 or 
-        167 < event.y < 173 or 
-        87 < event.y < 93):
+    if (event.y > THEME_CHANGE_Y_THRESHOLD or 
+        GRID_VERTICAL_LEFT - GRID_LINE_CLICK_RANGE < event.x < GRID_VERTICAL_LEFT + GRID_LINE_CLICK_RANGE or 
+        GRID_VERTICAL_RIGHT - GRID_LINE_CLICK_RANGE < event.x < GRID_VERTICAL_RIGHT + GRID_LINE_CLICK_RANGE or 
+        GRID_HORIZONTAL_TOP - GRID_LINE_CLICK_RANGE < event.y < GRID_HORIZONTAL_TOP + GRID_LINE_CLICK_RANGE or 
+        GRID_HORIZONTAL_BOTTOM - GRID_LINE_CLICK_RANGE < event.y < GRID_HORIZONTAL_BOTTOM + GRID_LINE_CLICK_RANGE):
         change_theme(event)
     
     # Map click position to grid cell
     row, col = -1, -1
     
     # Top row
-    if 30 < event.y < 85:
-        if 170 < event.x < 245: row, col = 0, 0
-        elif 250 < event.x < 345: row, col = 0, 1
-        elif 350 < event.x < 445: row, col = 0, 2
+    if TOP_ROW_MIN_Y < event.y < TOP_ROW_MAX_Y:
+        if LEFT_COL_MIN_X < event.x < LEFT_COL_MAX_X: row, col = 0, 0
+        elif MIDDLE_COL_MIN_X < event.x < MIDDLE_COL_MAX_X: row, col = 0, 1
+        elif RIGHT_COL_MIN_X < event.x < RIGHT_COL_MAX_X: row, col = 0, 2
     
     # Middle row
-    elif 90 < event.y < 160:
-        if 170 < event.x < 245: row, col = 1, 0
-        elif 250 < event.x < 345: row, col = 1, 1
-        elif 350 < event.x < 445: row, col = 1, 2
+    elif MIDDLE_ROW_MIN_Y < event.y < MIDDLE_ROW_MAX_Y:
+        if LEFT_COL_MIN_X < event.x < LEFT_COL_MAX_X: row, col = 1, 0
+        elif MIDDLE_COL_MIN_X < event.x < MIDDLE_COL_MAX_X: row, col = 1, 1
+        elif RIGHT_COL_MIN_X < event.x < RIGHT_COL_MAX_X: row, col = 1, 2
     
     # Bottom row
-    elif 150 < event.y < 220:
-        if 170 < event.x < 245: row, col = 2, 0
-        elif 250 < event.x < 345: row, col = 2, 1
-        elif 350 < event.x < 445: row, col = 2, 2
+    elif BOTTOM_ROW_MIN_Y < event.y < BOTTOM_ROW_MAX_Y:
+        if LEFT_COL_MIN_X < event.x < LEFT_COL_MAX_X: row, col = 2, 0
+        elif MIDDLE_COL_MIN_X < event.x < MIDDLE_COL_MAX_X: row, col = 2, 1
+        elif RIGHT_COL_MIN_X < event.x < RIGHT_COL_MAX_X: row, col = 2, 2
     
     # If valid cell and empty
-    if row != -1 and game_board[row][col] == 0:
+    if row != -1 and game_board[row][col] == EMPTY_CELL:
         draw_o(event, game_canvas)
-        game_board[row][col] = 'o'
-        current_player = 1
+        game_board[row][col] = SYMBOL_O
+        current_player = PLAYER_X
         check_win_or_draw()
         
         if computer_mode_var.get() == 1:  # Computer mode
@@ -417,39 +401,39 @@ def on_board_click_player_x(event):
     global game_board, current_player
     
     # Change theme if grid line clicked
-    if (event.y > 250 or 
-        248 < event.x < 253 or 
-        347 < event.x < 352 or 
-        167 < event.y < 173 or 
-        87 < event.y < 93):
+    if (event.y > THEME_CHANGE_Y_THRESHOLD or 
+        GRID_VERTICAL_LEFT - GRID_LINE_CLICK_RANGE < event.x < GRID_VERTICAL_LEFT + GRID_LINE_CLICK_RANGE or 
+        GRID_VERTICAL_RIGHT - GRID_LINE_CLICK_RANGE < event.x < GRID_VERTICAL_RIGHT + GRID_LINE_CLICK_RANGE or 
+        GRID_HORIZONTAL_TOP - GRID_LINE_CLICK_RANGE < event.y < GRID_HORIZONTAL_TOP + GRID_LINE_CLICK_RANGE or 
+        GRID_HORIZONTAL_BOTTOM - GRID_LINE_CLICK_RANGE < event.y < GRID_HORIZONTAL_BOTTOM + GRID_LINE_CLICK_RANGE):
         change_theme(event)
     
     # Map click position to grid cell
     row, col = -1, -1
     
     # Top row
-    if 30 < event.y < 85:
-        if 170 < event.x < 245: row, col = 0, 0
-        elif 250 < event.x < 345: row, col = 0, 1
-        elif 350 < event.x < 445: row, col = 0, 2
+    if TOP_ROW_MIN_Y < event.y < TOP_ROW_MAX_Y:
+        if LEFT_COL_MIN_X < event.x < LEFT_COL_MAX_X: row, col = 0, 0
+        elif MIDDLE_COL_MIN_X < event.x < MIDDLE_COL_MAX_X: row, col = 0, 1
+        elif RIGHT_COL_MIN_X < event.x < RIGHT_COL_MAX_X: row, col = 0, 2
     
     # Middle row
-    elif 90 < event.y < 160:
-        if 170 < event.x < 245: row, col = 1, 0
-        elif 250 < event.x < 345: row, col = 1, 1
-        elif 350 < event.x < 445: row, col = 1, 2
+    elif MIDDLE_ROW_MIN_Y < event.y < MIDDLE_ROW_MAX_Y:
+        if LEFT_COL_MIN_X < event.x < LEFT_COL_MAX_X: row, col = 1, 0
+        elif MIDDLE_COL_MIN_X < event.x < MIDDLE_COL_MAX_X: row, col = 1, 1
+        elif RIGHT_COL_MIN_X < event.x < RIGHT_COL_MAX_X: row, col = 1, 2
     
     # Bottom row
-    elif 150 < event.y < 220:
-        if 170 < event.x < 245: row, col = 2, 0
-        elif 250 < event.x < 345: row, col = 2, 1
-        elif 350 < event.x < 445: row, col = 2, 2
+    elif BOTTOM_ROW_MIN_Y < event.y < BOTTOM_ROW_MAX_Y:
+        if LEFT_COL_MIN_X < event.x < LEFT_COL_MAX_X: row, col = 2, 0
+        elif MIDDLE_COL_MIN_X < event.x < MIDDLE_COL_MAX_X: row, col = 2, 1
+        elif RIGHT_COL_MIN_X < event.x < RIGHT_COL_MAX_X: row, col = 2, 2
     
     # If valid cell and empty
-    if row != -1 and game_board[row][col] == 0:
+    if row != -1 and game_board[row][col] == EMPTY_CELL:
         draw_x(event, game_canvas)
-        game_board[row][col] = 'x'
-        current_player = 0
+        game_board[row][col] = SYMBOL_X
+        current_player = PLAYER_O
         check_win_or_draw()
         handle_two_players_click()
 
@@ -457,9 +441,9 @@ def reset_board():
     """Reset game board to initial state"""
     global game_board
     game_board = [
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]
+        [EMPTY_CELL, EMPTY_CELL, EMPTY_CELL],
+        [EMPTY_CELL, EMPTY_CELL, EMPTY_CELL],
+        [EMPTY_CELL, EMPTY_CELL, EMPTY_CELL]
     ]
 
 def setup_game_ui():
@@ -467,28 +451,28 @@ def setup_game_ui():
     global player_o_radio, player_x_radio, o_wins_label, x_wins_label, computer_mode_check
     
     # Create UI elements
-    player_o_radio = Radiobutton(root, text='', variable=starting_player_var, value=0, command=update_starting_player)
-    player_x_radio = Radiobutton(root, text='', variable=starting_player_var, value=1, command=update_starting_player)
+    player_o_radio = Radiobutton(root, text='', variable=starting_player_var, value=PLAYER_O, command=update_starting_player)
+    player_x_radio = Radiobutton(root, text='', variable=starting_player_var, value=PLAYER_X, command=update_starting_player)
     
-    o_wins_label = Label(text=f"O\n{o_wins}", background='cyan')
-    x_wins_label = Label(text=f"X\n{x_wins}", background='cyan')
+    o_wins_label = Label(text=f"O\n{o_wins}", background=DEFAULT_BACKGROUND)
+    x_wins_label = Label(text=f"X\n{x_wins}", background=DEFAULT_BACKGROUND)
     
     # Position UI elements
-    o_wins_label.grid(column=0, row=1, ipadx=20, ipady=3)
-    x_wins_label.grid(column=2, row=1, ipadx=20, ipady=3)
+    o_wins_label.grid(column=0, row=1, ipadx=LABEL_PADDING_X, ipady=LABEL_PADDING_Y)
+    x_wins_label.grid(column=2, row=1, ipadx=LABEL_PADDING_X, ipady=LABEL_PADDING_Y)
     player_x_radio.grid(column=2, row=2)
     player_o_radio.grid(column=0, row=2)
     
     # Computer mode checkbox
     computer_mode_check = Checkbutton(
         root, 
-        text='Play with computer', 
+        text=COMPUTER_MODE_TEXT, 
         variable=computer_mode_var, 
         command=toggle_computer_mode
     )
     computer_mode_check.grid(column=0, columnspan=3, row=7, sticky='w')
     
-    current_player = 0
+    current_player = PLAYER_O
     player_o_radio.select()  # Default to player O starting
 
 def toggle_computer_mode():
@@ -496,14 +480,14 @@ def toggle_computer_mode():
     global current_player, o_wins, x_wins, moves_count, game_board
     
     computer_mode = computer_mode_var.get()
-    current_player = 0
+    current_player = PLAYER_O
     moves_count = 0
     o_wins = 0
     x_wins = 0
     
     # Update UI
-    o_wins_label.configure(background=color_themes[current_theme_index][0])
-    x_wins_label.configure(background=color_themes[current_theme_index][0])
+    o_wins_label.configure(background=COLOR_THEMES[current_theme_index][0])
+    x_wins_label.configure(background=COLOR_THEMES[current_theme_index][0])
     o_wins_label.configure(text=f"O\n{o_wins}")
     x_wins_label.configure(text=f"X\n{x_wins}")
     
@@ -519,20 +503,21 @@ def toggle_computer_mode():
 def show_about():
     """Show about information"""
     msg.showinfo(
-        'About X/O Game', 
-        'A simple Tic-Tac-Toe game\n'
-        'Developed by Eng. Mahfoud Mohammed Binsabbah\n'
-        '2020'
+        ABOUT_TITLE, 
+        ABOUT_MESSAGE
     )
     
     feedback = msg.askyesno(
-        'Feedback', 
-        'Do you like this game?\n'
-        'Give me a star on GitHub repository!'
+        FEEDBACK_TITLE, 
+        FEEDBACK_MESSAGE
     )
     
     if feedback:
-        webbrowser.open('https://github.com/Mahfoud-Sa/XO_Game.git')
+        webbrowser.open(GITHUB_URL)
+
+def update_score_display():
+    """Update the score display (placeholder function)"""
+    pass
 
 def change_theme_manual():
     """Manually change the game theme"""
@@ -540,11 +525,11 @@ def change_theme_manual():
 
 # Initialize main application
 root = Tk()
-root.title('X/O Game')
+root.title(WINDOW_TITLE)
 
 # Set window icon
 try:
-    icon_path = path.abspath(path.join(path.dirname(__file__), 'icon.png'))
+    icon_path = path.abspath(path.join(path.dirname(__file__), ICON_PATH))
     root.iconphoto(False, PhotoImage(file=icon_path))
 except:
     pass  # Icon not essential
@@ -556,31 +541,31 @@ menu_bar = Menu(root)
 root.configure(menu=menu_bar)
 
 # Help menu
-help_menu = Menu(menu_bar, tearoff=0)
-help_menu.add_command(label='Change Theme', command=change_theme_manual)
-help_menu.add_command(label='About', command=show_about)
+help_menu = Menu(menu_bar, tearoff=MENU_TEAROFF)
+help_menu.add_command(label=CHANGE_THEME_TEXT, command=change_theme_manual)
+help_menu.add_command(label=ABOUT_TEXT, command=show_about)
 help_menu.add_separator()
-help_menu.add_command(label='Exit', command=root.destroy)
-menu_bar.add_cascade(label='Help', menu=help_menu)
+help_menu.add_command(label=EXIT_MENU_TEXT, command=root.destroy)
+menu_bar.add_cascade(label=HELP_MENU_TEXT, menu=help_menu)
 
 # Game variables
 starting_player_var = IntVar()  # 0 = O, 1 = X
 computer_mode_var = IntVar()    # 0 = Two players, 1 = vs Computer
 
 # UI elements
-title_label = Label(text='X/O Game', font=('Arial', 14), relief='groove')
-play_button = Button(root, text='Play', font=('Arial', 10), command=start_game)
-drawing_canvas = Canvas(height=300, width=600, background='cyan')
-game_canvas = Canvas(height=30, width=600, background='gray')
+title_label = Label(text=WINDOW_TITLE, font=TITLE_FONT, relief='groove')
+play_button = Button(root, text=PLAY_BUTTON_TEXT, font=BUTTON_FONT, command=start_game)
+drawing_canvas = Canvas(height=DRAWING_CANVAS_HEIGHT, width=CANVAS_WIDTH, background=DEFAULT_BACKGROUND)
+game_canvas = Canvas(height=GAME_CANVAS_HEIGHT, width=CANVAS_WIDTH, background=DEFAULT_GRID)
 
 # Position UI elements
 title_label.grid(column=1, row=0)
-play_button.grid(column=1, row=1, rowspan=1, ipadx=9)
+play_button.grid(column=1, row=1, rowspan=1, ipadx=BUTTON_PADDING_X)
 drawing_canvas.grid(column=0, row=4, columnspan=3)
 game_canvas.grid(column=0, row=5, columnspan=3)
 
 # Initial drawing
-draw_random_shapes(20)
+draw_random_shapes(INITIAL_SHAPES_COUNT)
 
 # Bind events
 drawing_canvas.bind("<Button>", on_drawing_canvas_click)
