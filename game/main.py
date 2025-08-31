@@ -7,6 +7,7 @@ from os import path
 from config import *
 from views.widgets.title_label import create_title_label
 from views.widgets.help_menu import create_help_menu
+from views.widgets.play_button import create_play_button
 
 # Global game state variables
 drawing_counter = 0
@@ -569,12 +570,17 @@ title_label = create_title_label(
     grid_options={"column": 1, "row": 0}
 )
 
-play_button = Button(root, text=PLAY_BUTTON_TEXT, font=BUTTON_FONT, command=start_game)
+play_button = create_play_button(
+    root,
+    PLAY_BUTTON_TEXT,
+    BUTTON_FONT,
+    start_game,
+    grid_options={"column": 1, "row": 1, "rowspan": 1, "ipadx": BUTTON_PADDING_X}
+)
+
 drawing_canvas = Canvas(height=DRAWING_CANVAS_HEIGHT, width=CANVAS_WIDTH, background=DEFAULT_BACKGROUND)
 game_canvas = Canvas(height=GAME_CANVAS_HEIGHT, width=CANVAS_WIDTH, background=DEFAULT_GRID)
 
-# Position UI elements (except title_label, which is now positioned in create_title_label)
-play_button.grid(column=1, row=1, rowspan=1, ipadx=BUTTON_PADDING_X)
 drawing_canvas.grid(column=0, row=4, columnspan=3)
 game_canvas.grid(column=0, row=5, columnspan=3)
 
