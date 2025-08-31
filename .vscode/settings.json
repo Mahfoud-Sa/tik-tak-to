@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./game/views/helo_",
+        "./game/views/helo_"
+    ]
+}

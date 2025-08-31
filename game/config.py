@@ -91,7 +91,7 @@ UI_SETUP_DELAY = 40  # milliseconds
 # =============================================================================
 # TEXT CONSTANTS
 # =============================================================================
-WINDOW_TITLE = 'X/O Game'
+WINDOW_TITLE = 'Tik tak toe Game'
 PLAY_BUTTON_TEXT = 'Play'
 EXIT_BUTTON_TEXT = 'Exit'
 COMPUTER_MODE_TEXT = 'Play with computer'

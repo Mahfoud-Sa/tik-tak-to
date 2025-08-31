@@ -5,6 +5,8 @@ from tkinter import messagebox as msg
 import os
 from os import path
 from config import *
+from views.widgets.title_label import create_title_label
+from views.widgets.help_menu import create_help_menu
 
 # Global game state variables
 drawing_counter = 0
@@ -523,6 +525,8 @@ def change_theme_manual():
     """Manually change the game theme"""
     change_theme()
 
+
+
 # Initialize main application
 root = Tk()
 root.title(WINDOW_TITLE)
@@ -537,29 +541,39 @@ except:
 root.resizable(0, 0)
 
 # Create menu
-menu_bar = Menu(root)
-root.configure(menu=menu_bar)
+# menu_bar = Menu(root)
+# root.configure(menu=menu_bar)
 
-# Help menu
-help_menu = Menu(menu_bar, tearoff=MENU_TEAROFF)
-help_menu.add_command(label=CHANGE_THEME_TEXT, command=change_theme_manual)
-help_menu.add_command(label=ABOUT_TEXT, command=show_about)
-help_menu.add_separator()
-help_menu.add_command(label=EXIT_MENU_TEXT, command=root.destroy)
-menu_bar.add_cascade(label=HELP_MENU_TEXT, menu=help_menu)
+# # Help menu
+create_help_menu(
+    root,
+    change_theme_manual,
+    show_about,
+    root.destroy,
+    CHANGE_THEME_TEXT,
+    ABOUT_TEXT,
+    EXIT_MENU_TEXT,
+    HELP_MENU_TEXT,
+    MENU_TEAROFF
+)
 
 # Game variables
 starting_player_var = IntVar()  # 0 = O, 1 = X
 computer_mode_var = IntVar()    # 0 = Two players, 1 = vs Computer
 
-# UI elements
-title_label = Label(text=WINDOW_TITLE, font=TITLE_FONT, relief='groove')
+title_label = create_title_label(
+    root,
+    WINDOW_TITLE,
+    TITLE_FONT,
+    'groove',
+    grid_options={"column": 1, "row": 0}
+)
+
 play_button = Button(root, text=PLAY_BUTTON_TEXT, font=BUTTON_FONT, command=start_game)
 drawing_canvas = Canvas(height=DRAWING_CANVAS_HEIGHT, width=CANVAS_WIDTH, background=DEFAULT_BACKGROUND)
 game_canvas = Canvas(height=GAME_CANVAS_HEIGHT, width=CANVAS_WIDTH, background=DEFAULT_GRID)
 
-# Position UI elements
-title_label.grid(column=1, row=0)
+# Position UI elements (except title_label, which is now positioned in create_title_label)
 play_button.grid(column=1, row=1, rowspan=1, ipadx=BUTTON_PADDING_X)
 drawing_canvas.grid(column=0, row=4, columnspan=3)
 game_canvas.grid(column=0, row=5, columnspan=3)
