@@ -1,6 +1,6 @@
 """Game View - Handles all visual rendering of the game."""
 
-from tkinter import Canvas, Label, Radiobutton, Checkbutton, IntVar
+from tkinter import Canvas, Label, Radiobutton, IntVar
 from random import randrange
 
 from config import (
@@ -21,7 +21,7 @@ from config import (
     RIGHT_COL_MIN_X, RIGHT_COL_MAX_X,
     THEME_CHANGE_Y_THRESHOLD,
     LABEL_PADDING_X, LABEL_PADDING_Y,
-    COMPUTER_MODE_TEXT, O_WIN_DELAY,
+    O_WIN_DELAY,
     MIN_RADIUS, MAX_RADIUS, RADIUS_STEP,
     MIN_WIDTH, MAX_WIDTH, WIDTH_STEP,
     MIN_POSITION, MAX_POSITION, INITIAL_SHAPES_COUNT,
@@ -63,9 +63,7 @@ class GameView:
         self.x_wins_label = None
         self.player_o_radio = None
         self.player_x_radio = None
-        self.computer_mode_check = None
         self.starting_player_var = IntVar()
-        self.computer_mode_var = IntVar()
         
         # Place canvases
         self.drawing_canvas.grid(column=0, row=4, columnspan=3)
@@ -112,20 +110,11 @@ class GameView:
             command=self._on_starting_player_change
         )
         
-        # Computer mode checkbox
-        self.computer_mode_check = Checkbutton(
-            self.root,
-            text=COMPUTER_MODE_TEXT,
-            variable=self.computer_mode_var,
-            command=self._on_computer_mode_toggle
-        )
-        
         # Place UI elements
         self.o_wins_label.grid(column=0, row=1, ipadx=LABEL_PADDING_X, ipady=LABEL_PADDING_Y)
         self.x_wins_label.grid(column=2, row=1, ipadx=LABEL_PADDING_X, ipady=LABEL_PADDING_Y)
         self.player_o_radio.grid(column=0, row=2)
         self.player_x_radio.grid(column=2, row=2)
-        self.computer_mode_check.grid(column=0, columnspan=3, row=7, sticky='w')
         
         # Default selection
         self.player_o_radio.select()
@@ -147,9 +136,6 @@ class GameView:
         if self.player_x_radio:
             self.player_x_radio.destroy()
             self.player_x_radio = None
-        if self.computer_mode_check:
-            self.computer_mode_check.destroy()
-            self.computer_mode_check = None
         
         # Unbind click
         self.game_canvas.unbind("<Button-1>")
@@ -265,10 +251,29 @@ class GameView:
         self.clear_board()
         self.draw_grid(grid_color)
         
+        # Redraw all existing symbols from the board
+        self._redraw_symbols()
+        
         if self.o_wins_label:
             self.o_wins_label.configure(background=bg_color)
         if self.x_wins_label:
             self.x_wins_label.configure(background=bg_color)
+    
+    def _redraw_symbols(self):
+        """Redraw all symbols currently on the board."""
+        if not self.controller or not self.controller.state:
+            return
+        
+        board = self.controller.state.board
+        from config import SYMBOL_O, SYMBOL_X, EMPTY_CELL, BOARD_SIZE
+        
+        for row in range(BOARD_SIZE):
+            for col in range(BOARD_SIZE):
+                cell = board.get_cell(row, col)
+                if cell == SYMBOL_O:
+                    self.draw_o(row, col)
+                elif cell == SYMBOL_X:
+                    self.draw_x(row, col)
     
     def get_cell_from_click(self, x: int, y: int) -> tuple[int, int]:
         """
@@ -327,11 +332,6 @@ class GameView:
         """Handle starting player radio button change."""
         if self.controller:
             self.controller.set_starting_player(self.starting_player_var.get())
-    
-    def _on_computer_mode_toggle(self):
-        """Handle computer mode checkbox toggle."""
-        if self.controller:
-            self.controller.toggle_computer_mode()
     
     def _get_random_symbol_color(self) -> str:
         """Get a random color for symbols."""

@@ -12,14 +12,13 @@ class GameState:
         """Initialize game state."""
         self.board = Board()
         self.players = [
-            Player(SYMBOL_O, is_computer=False),  # Player O (index 0)
-            Player(SYMBOL_X, is_computer=False),  # Player X (index 1)
+            Player(SYMBOL_O),  # Player O (index 0)
+            Player(SYMBOL_X),  # Player X (index 1)
         ]
         self.current_player_index = PLAYER_O
         self.moves_count = 0
         self.theme_index = DEFAULT_THEME_INDEX
         self.is_game_active = False
-        self.is_computer_mode = False
     
     @property
     def current_player(self) -> Player:
@@ -61,12 +60,6 @@ class GameState:
         self.current_player_index = PLAYER_O
         for player in self.players:
             player.reset_wins()
-    
-    def set_computer_mode(self, enabled: bool):
-        """Enable or disable computer opponent mode."""
-        self.is_computer_mode = enabled
-        self.players[PLAYER_X].is_computer = enabled
-        self.reset_all()
     
     def start_game(self):
         """Start a new game."""

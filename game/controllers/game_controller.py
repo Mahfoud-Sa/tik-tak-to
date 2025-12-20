@@ -3,10 +3,9 @@
 from random import randrange
 from config import (
     PLAYER_O, PLAYER_X, SYMBOL_O, SYMBOL_X,
-    COLOR_THEMES, NUM_THEMES, COMPUTER_MOVE_DELAY
+    COLOR_THEMES, NUM_THEMES
 )
 from models.game_state import GameState
-from controllers.ai_controller import AIController
 
 
 class GameController:
@@ -22,7 +21,6 @@ class GameController:
         """
         self.state = game_state
         self.view = view
-        self.ai = AIController()
         self._on_game_start_callback = None
         self._on_game_end_callback = None
     
@@ -74,10 +72,6 @@ class GameController:
         
         current = self.state.current_player
         
-        # Skip if it's computer's turn and human clicked
-        if current.is_computer:
-            return
-        
         # Try to make the move
         if self.state.board.make_move(row, col, current.symbol):
             # Draw the symbol
@@ -99,33 +93,6 @@ class GameController:
             
             if self.view:
                 self.view.update_current_player_indicator(self.state.current_player.symbol)
-            
-            # If next player is computer, schedule its move
-            if self.state.current_player.is_computer and self.state.is_game_active:
-                if self.view and hasattr(self.view, 'root'):
-                    self.view.root.after(COMPUTER_MOVE_DELAY, self._computer_move)
-    
-    def _computer_move(self):
-        """Execute the computer's move."""
-        if not self.state.is_game_active:
-            return
-        
-        move = self.ai.find_best_move(self.state.board)
-        if move:
-            row, col = move
-            if self.state.board.make_move(row, col, SYMBOL_X):
-                if self.view:
-                    self.view.draw_x(row, col)
-                    self.view.update_current_player_indicator(SYMBOL_X)
-                
-                self.state.increment_moves()
-                
-                if self._check_game_end():
-                    return
-                
-                self.state.switch_player()
-                if self.view:
-                    self.view.update_current_player_indicator(self.state.current_player.symbol)
     
     def _check_game_end(self) -> bool:
         """
@@ -169,17 +136,6 @@ class GameController:
         if self.view:
             self.view.schedule_board_reset()
             self.view.update_current_player_indicator(self.state.current_player.symbol)
-    
-    def toggle_computer_mode(self):
-        """Toggle between two-player and vs computer mode."""
-        new_mode = not self.state.is_computer_mode
-        self.state.set_computer_mode(new_mode)
-        
-        if self.view:
-            self.view.clear_board()
-            self.view.draw_grid()
-            self.view.update_scores(0, 0)
-            self.view.update_current_player_indicator(SYMBOL_O)
     
     def change_theme(self):
         """Change to a random theme."""

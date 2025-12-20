@@ -83,7 +83,6 @@ COLOR_THEMES = [
 # =============================================================================
 # TIMING CONSTANTS
 # =============================================================================
-COMPUTER_MOVE_DELAY = 300  # milliseconds
 O_WIN_DELAY = 1000  # milliseconds
 X_WIN_DELAY = 600  # milliseconds
 UI_SETUP_DELAY = 40  # milliseconds
@@ -94,7 +93,6 @@ UI_SETUP_DELAY = 40  # milliseconds
 WINDOW_TITLE = 'Tik tak toe Game'
 PLAY_BUTTON_TEXT = 'Play'
 EXIT_BUTTON_TEXT = 'Exit'
-COMPUTER_MODE_TEXT = 'Play with computer'
 CHANGE_THEME_TEXT = 'Change Theme'
 ABOUT_TEXT = 'About'
 EXIT_MENU_TEXT = 'Exit'
@@ -159,11 +157,7 @@ LABEL_PADDING_X = 20
 LABEL_PADDING_Y = 3
 BUTTON_PADDING_X = 9
 
-# =============================================================================
-# GAME STATE CONSTANTS
-# =============================================================================
-# Corner positions for computer AI
-CORNER_POSITIONS = [(0, 0), (0, 2), (2, 0), (2, 2)]
+
 
 # =============================================================================
 # MENU CONSTANTS
