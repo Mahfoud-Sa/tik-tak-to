@@ -1,12 +1,33 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
 a = Analysis(
     ['main.py'],
-    pathex=[],
+    pathex=['.'],
     binaries=[],
-    datas=[('assets/icons/icon.png', '.')],
-    hiddenimports=[],
+    datas=[('assets/icons/icon.png', 'assets/icons')],
+    hiddenimports=[
+        'models',
+        'models.board',
+        'models.player',
+        'models.game_state',
+        'views',
+        'views.game_view',
+        'views.dialogs',
+        'views.widgets',
+        'views.widgets.title_label',
+        'views.widgets.play_button',
+        'views.widgets.help_menu',
+        'views.widgets.multiplayer_dialogs',
+        'controllers',
+        'controllers.game_controller',
+        'controllers.network_game_controller',
+        'network',
+        'network.protocol',
+        'network.server',
+        'network.client',
+        'config',
+        'network_config',
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -16,30 +37,25 @@ a = Analysis(
 )
 pyz = PYZ(a.pure)
 
+# Single-file executable - bundles everything into one .exe
 exe = EXE(
     pyz,
     a.scripts,
+    a.binaries,
+    a.datas,
     [],
-    exclude_binaries=True,
     name='XO Game',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
+    upx_exclude=[],
+    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['assets/icons/icon.ico'],
-)
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.datas,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name='XO Game',
+    icon=None,
 )
