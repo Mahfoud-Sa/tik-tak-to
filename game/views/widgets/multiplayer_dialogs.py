@@ -1,8 +1,9 @@
 """Multiplayer dialogs for hosting and joining games."""
 
-from tkinter import Toplevel, Label, Button, Entry, Frame, Canvas, StringVar
+from tkinter import Toplevel, Label, Button, Entry, Frame, Canvas, StringVar, PhotoImage
 from tkinter import messagebox as msg
 from typing import Callable, Optional
+from os import path
 
 from network_config import (
     HOST_GAME_TEXT, JOIN_GAME_TEXT, WAITING_TEXT, CONNECTED_TEXT,
@@ -25,17 +26,20 @@ class MultiplayerModeDialog:
             on_join: Callback when Join is selected
         """
         self.dialog = Toplevel(parent)
-        self.dialog.title("Multiplayer Mode")
+        self.dialog.title("وضع متعدد اللاعبين")
         self.dialog.resizable(False, False)
         self.dialog.transient(parent)
         self.dialog.grab_set()
         
         # Center the dialog
-        self.dialog.geometry("300x200")
+        self.dialog.geometry("300x250")
         self._center_window(parent)
         
         self._on_host = on_host
         self._on_join = on_join
+        
+        # Set icon to match main window
+        self._set_icon()
         
         self._create_ui()
     
@@ -50,7 +54,7 @@ class MultiplayerModeDialog:
         ph = parent.winfo_height()
         
         w = 300
-        h = 200
+        h = 250
         x = px + (pw - w) // 2
         y = py + (ph - h) // 2
         
@@ -61,7 +65,7 @@ class MultiplayerModeDialog:
         # Title
         title = Label(
             self.dialog,
-            text="Choose Game Mode",
+            text="اختر وضع اللعب",
             font=('Arial', 14, 'bold')
         )
         title.pack(pady=20)
@@ -93,8 +97,9 @@ class MultiplayerModeDialog:
         # Cancel button
         cancel_btn = Button(
             self.dialog,
-            text=CANCEL_TEXT,
-            font=('Arial', 10),
+            text=f"❌ {CANCEL_TEXT}",
+            font=('Arial', 8),
+            width=15,
             command=self.close
         )
         cancel_btn.pack(pady=10)
@@ -112,6 +117,15 @@ class MultiplayerModeDialog:
     def close(self):
         """Close the dialog."""
         self.dialog.destroy()
+    
+    def _set_icon(self):
+        """Set the dialog icon to match main window."""
+        try:
+            icon_path = path.abspath(path.join(path.dirname(__file__), '../../assets/icons/icon.png'))
+            self._icon = PhotoImage(file=icon_path)
+            self.dialog.iconphoto(False, self._icon)
+        except Exception:
+            pass  # Icon not essential
 
 
 class HostGameDialog:
@@ -128,7 +142,7 @@ class HostGameDialog:
             on_refresh: Callback when refresh clicked
         """
         self.dialog = Toplevel(parent)
-        self.dialog.title("Host Game")
+        self.dialog.title("استضافة لعبة")
         self.dialog.resizable(False, False)
         self.dialog.transient(parent)
         self.dialog.grab_set()
@@ -142,6 +156,9 @@ class HostGameDialog:
         
         # Connection status
         self._is_connected = False
+        
+        # Set icon to match main window
+        self._set_icon()
         
         self._create_ui()
     
@@ -167,7 +184,7 @@ class HostGameDialog:
         # Title
         title = Label(
             self.dialog,
-            text="Hosting Game",
+            text="جاري الاستضافة",
             font=('Arial', 14, 'bold')
         )
         title.pack(pady=15)
@@ -243,7 +260,7 @@ class HostGameDialog:
         # Cancel button
         cancel_btn = Button(
             btn_frame,
-            text=CANCEL_TEXT,
+            text=f"❌ {CANCEL_TEXT}",
             font=('Arial', 10),
             width=10,
             command=self._on_cancel_click
@@ -288,6 +305,15 @@ class HostGameDialog:
     def close(self):
         """Close the dialog."""
         self.dialog.destroy()
+    
+    def _set_icon(self):
+        """Set the dialog icon to match main window."""
+        try:
+            icon_path = path.abspath(path.join(path.dirname(__file__), '../../assets/icons/icon.png'))
+            self._icon = PhotoImage(file=icon_path)
+            self.dialog.iconphoto(False, self._icon)
+        except Exception:
+            pass  # Icon not essential
 
 
 class JoinGameDialog:
@@ -303,7 +329,7 @@ class JoinGameDialog:
             on_cancel: Callback when cancelled
         """
         self.dialog = Toplevel(parent)
-        self.dialog.title("Join Game")
+        self.dialog.title("الانضمام للعبة")
         self.dialog.resizable(False, False)
         self.dialog.transient(parent)
         self.dialog.grab_set()
@@ -316,6 +342,9 @@ class JoinGameDialog:
         
         # Connection status
         self._is_connected = False
+        
+        # Set icon to match main window
+        self._set_icon()
         
         self._create_ui()
     
@@ -341,7 +370,7 @@ class JoinGameDialog:
         # Title
         title = Label(
             self.dialog,
-            text="Join Game",
+            text="الانضمام للعبة",
             font=('Arial', 14, 'bold')
         )
         title.pack(pady=15)
@@ -397,7 +426,7 @@ class JoinGameDialog:
         # Status text
         self._status_label = Label(
             status_frame,
-            text="Not connected",
+            text="غير متصل",
             font=('Arial', 11)
         )
         self._status_label.pack(side='left')
@@ -429,7 +458,7 @@ class JoinGameDialog:
         # Cancel button
         cancel_btn = Button(
             btn_frame,
-            text=CANCEL_TEXT,
+            text=f"❌ {CANCEL_TEXT}",
             font=('Arial', 10),
             width=10,
             command=self._on_cancel_click
@@ -461,7 +490,7 @@ class JoinGameDialog:
             self._status_circle,
             fill=STATUS_WAITING_COLOR
         )
-        self._status_label.config(text="Connecting...")
+        self._status_label.config(text="جاري الاتصال...")
     
     def set_error(self, message: str):
         """Set status to error."""
@@ -475,7 +504,7 @@ class JoinGameDialog:
         """Handle connect button click."""
         ip = self._ip_var.get().strip()
         if not ip:
-            msg.showwarning("Input Required", "Please enter an IP address")
+            msg.showwarning("مطلوب إدخال", "الرجاء إدخال عنوان IP")
             return
         
         self.set_connecting()
@@ -496,3 +525,12 @@ class JoinGameDialog:
     def close(self):
         """Close the dialog."""
         self.dialog.destroy()
+    
+    def _set_icon(self):
+        """Set the dialog icon to match main window."""
+        try:
+            icon_path = path.abspath(path.join(path.dirname(__file__), '../../assets/icons/icon.png'))
+            self._icon = PhotoImage(file=icon_path)
+            self.dialog.iconphoto(False, self._icon)
+        except Exception:
+            pass  # Icon not essential

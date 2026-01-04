@@ -1,4 +1,5 @@
-# Configuration constants for X/O Game
+__version__ = "5.0.0"
+
 
 # =============================================================================
 # GAME LOGIC CONSTANTS
@@ -88,21 +89,21 @@ X_WIN_DELAY = 600  # milliseconds
 UI_SETUP_DELAY = 40  # milliseconds
 
 # =============================================================================
-# TEXT CONSTANTS
+# TEXT CONSTANTS (Arabic)
 # =============================================================================
-WINDOW_TITLE = 'Tik tak toe Game'
-PLAY_BUTTON_TEXT = 'Play'
-EXIT_BUTTON_TEXT = 'Exit'
-CHANGE_THEME_TEXT = 'Change Theme'
-ABOUT_TEXT = 'About'
-EXIT_MENU_TEXT = 'Exit'
-HELP_MENU_TEXT = 'Help'
+WINDOW_TITLE = 'لعبة إكس أو'
+PLAY_BUTTON_TEXT = 'ابدأ اللعب'
+EXIT_BUTTON_TEXT = 'خروج'
+CHANGE_THEME_TEXT = 'تغيير السمة'
+ABOUT_TEXT = 'حول'
+EXIT_MENU_TEXT = 'خروج'
+HELP_MENU_TEXT = 'مساعدة'
 
 # About dialog
-ABOUT_TITLE = 'About X/O Game'
-ABOUT_MESSAGE = 'A simple Tic-Tac-Toe game\nDeveloped by Eng. Mahfoud Mohammed Binsabbah\n2020'
-FEEDBACK_TITLE = 'Feedback'
-FEEDBACK_MESSAGE = 'Do you like this game?\nGive me a star on GitHub repository!'
+ABOUT_TITLE = 'حول لعبة إكس أو'
+ABOUT_MESSAGE = f'لعبة إكس أو بسيطة\nالإصدار: {__version__}\nتم تطويرها بواسطة المهندس محفوظ محمد بن سباح\n2020 - 2024'
+FEEDBACK_TITLE = 'التقييم'
+FEEDBACK_MESSAGE = 'هل أعجبتك هذه اللعبة؟\nامنحني نجمة على مستودع GitHub!'
 
 # =============================================================================
 # FONT CONSTANTS

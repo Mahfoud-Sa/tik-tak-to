@@ -109,7 +109,7 @@ class TicTacToeApp:
             font=BUTTON_FONT,
             command=self._start_game
         )
-        self.play_button.pack(side='left', padx=5, ipadx=BUTTON_PADDING_X)
+        self.play_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
         
         # Multiplayer button
         self.multiplayer_button = Button(
@@ -118,7 +118,7 @@ class TicTacToeApp:
             font=BUTTON_FONT,
             command=self._show_multiplayer_dialog
         )
-        self.multiplayer_button.pack(side='left', padx=5, ipadx=BUTTON_PADDING_X)
+        self.multiplayer_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
         
         # Help menu
         create_help_menu(
@@ -213,7 +213,7 @@ class TicTacToeApp:
         ip_address = self.server.get_local_ip()
         
         if not self.server.start():
-            msg.showerror("Error", "Failed to start server. Port may be in use.")
+            msg.showerror("\u062e\u0637\u0623", "\u0641\u0634\u0644 \u0641\u064a \u0628\u062f\u0621 \u0627\u0644\u0633\u064a\u0631\u0641\u0631. \u0642\u062f \u064a\u0643\u0648\u0646 \u0627\u0644\u0645\u0646\u0641\u0630 \u0642\u064a\u062f \u0627\u0644\u0627\u0633\u062a\u062e\u062f\u0627\u0645.")
             return
         
         # Set up callbacks
@@ -379,7 +379,7 @@ class TicTacToeApp:
     def _on_opponent_disconnected(self):
         """Called when opponent disconnects during game."""
         self._update_connection_indicator(False)
-        msg.showwarning("Disconnected", "Your opponent has disconnected!")
+        msg.showwarning("\u062a\u0645 \u0642\u0637\u0639 \u0627\u0644\u0627\u062a\u0635\u0627\u0644", "\u0644\u0642\u062f \u0627\u0646\u0642\u0637\u0639 \u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u062e\u0635\u0645!")
         self._exit_multiplayer_game()
     
     def _exit_multiplayer_game(self):

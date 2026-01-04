@@ -12,23 +12,23 @@ MSG_DISCONNECT = 'DISCONNECT'
 MSG_PING = 'PING'
 MSG_PONG = 'PONG'
 
-# Multiplayer text
-MULTIPLAYER_BUTTON_TEXT = 'Multiplayer'
-HOST_GAME_TEXT = 'Host Game'
-JOIN_GAME_TEXT = 'Join Game'
-WAITING_TEXT = 'Waiting for player...'
-CONNECTED_TEXT = 'Connected!'
-CONNECTION_FAILED_TEXT = 'Connection failed'
-YOUR_TURN_TEXT = "Your Turn"
-OPPONENT_TURN_TEXT = "Opponent's Turn"
-ENTER_IP_TEXT = 'Enter Host IP:'
-REFRESH_TEXT = 'Refresh'
-CANCEL_TEXT = 'Cancel'
-CONNECT_TEXT = 'Connect'
-BACK_TEXT = 'Back'
-YOUR_IP_TEXT = 'Your IP: '
-PLAYER_CONNECTED_TEXT = 'Player Connected!'
-PLAYER_DISCONNECTED_TEXT = 'Player Disconnected'
+# Multiplayer text (Arabic)
+MULTIPLAYER_BUTTON_TEXT = 'متعدد اللاعبين'
+HOST_GAME_TEXT = 'استضافة لعبة'
+JOIN_GAME_TEXT = 'الانضمام للعبة'
+WAITING_TEXT = 'في انتظار لاعب...'
+CONNECTED_TEXT = 'متصل!'
+CONNECTION_FAILED_TEXT = 'فشل الاتصال'
+YOUR_TURN_TEXT = "دورك"
+OPPONENT_TURN_TEXT = "دور الخصم"
+ENTER_IP_TEXT = 'أدخل عنوان IP:'
+REFRESH_TEXT = 'تحديث'
+CANCEL_TEXT = 'إلغاء'
+CONNECT_TEXT = 'اتصال'
+BACK_TEXT = 'رجوع'
+YOUR_IP_TEXT = 'عنوان IP الخاص بك: '
+PLAYER_CONNECTED_TEXT = 'اللاعب متصل!'
+PLAYER_DISCONNECTED_TEXT = 'اللاعب قطع الاتصال'
 
 # Connection status colors
 STATUS_CONNECTED_COLOR = '#00FF00'  # Green
