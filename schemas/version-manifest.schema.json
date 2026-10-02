@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "XO Game Version Manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "name",
+    "version",
+    "tag_name",
+    "channel",
+    "published_at",
+    "release_notes",
+    "release_page_url",
+    "platforms"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "tag_name": {
+      "type": "string"
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["stable", "prerelease", "beta", "alpha"]
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "min_supported_version": {
+      "type": "string"
+    },
+    "mandatory": {
+      "type": "boolean"
+    },
+    "release_notes": {
+      "type": "string"
+    },
+    "release_page_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "platforms": {
+      "type": "object",
+      "properties": {
+        "windows": {
+          "type": "object",
+          "required": ["file_name", "download_url"],
+          "properties": {
+            "file_name": {
+              "type": "string"
+            },
+            "download_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "sha256": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

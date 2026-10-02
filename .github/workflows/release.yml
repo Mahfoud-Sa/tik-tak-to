@@ -1,0 +1,244 @@
+name: Release & Update Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Semantic version to release (e.g. 5.1.0 or v5.1.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Publish as Prerelease'
+        required: false
+        type: boolean
+        default: false
+      custom_notes:
+        description: 'Custom player-facing release notes'
+        required: false
+        type: string
+        default: ''
+      min_supported_version:
+        description: 'Minimum supported version (for mandatory updates, optional)'
+        required: false
+        type: string
+        default: ''
+      mandatory:
+        description: 'Mark update as mandatory'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref_name || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  validate_and_build:
+    name: Validate, Test & Build Release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install build and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Determine Target Version and Release Channel
+        id: meta
+        shell: bash
+        run: |
+          set -e
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG="${GITHUB_REF_NAME}"
+            VERSION="${TAG#v}"
+            # Check if tag has pre-release tag like -beta or -rc
+            if [[ "$VERSION" =~ - ]]; then
+              IS_PRERELEASE="true"
+              CHANNEL="prerelease"
+            else
+              IS_PRERELEASE="false"
+              CHANNEL="stable"
+            fi
+            CUSTOM_NOTES=""
+            MIN_VER=""
+            IS_MANDATORY="false"
+          else
+            RAW_INPUT="${{ github.event.inputs.version }}"
+            VERSION="${RAW_INPUT#v}"
+            TAG="v${VERSION}"
+            if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+              IS_PRERELEASE="true"
+              CHANNEL="prerelease"
+            else
+              IS_PRERELEASE="false"
+              CHANNEL="stable"
+            fi
+            CUSTOM_NOTES="${{ github.event.inputs.custom_notes }}"
+            MIN_VER="${{ github.event.inputs.min_supported_version }}"
+            IS_MANDATORY="${{ github.event.inputs.mandatory }}"
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "is_prerelease=${IS_PRERELEASE}" >> "$GITHUB_OUTPUT"
+          echo "channel=${CHANNEL}" >> "$GITHUB_OUTPUT"
+          echo "min_supported_version=${MIN_VER}" >> "$GITHUB_OUTPUT"
+          echo "mandatory=${IS_MANDATORY}" >> "$GITHUB_OUTPUT"
+          echo "custom_notes=${CUSTOM_NOTES}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate Version Agreement
+        shell: bash
+        run: |
+          echo "Validating codebase version against target version: ${{ steps.meta.outputs.version }}"
+          python scripts/validate_version.py --expected-version "${{ steps.meta.outputs.version }}"
+
+      - name: Create Git Tag (for manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists on repository."
+          else
+            echo "Creating tag $TAG..."
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          fi
+
+      - name: Run Test Suite
+        shell: bash
+        run: |
+          python -m compileall game
+          python -m unittest discover tests
+
+      - name: Build Windows Executable & Package ZIP
+        shell: bash
+        run: |
+          python scripts/build_release.py --version "${{ steps.meta.outputs.version }}" --tag "${{ steps.meta.outputs.tag }}" --output-dir dist
+
+      - name: Extract Release Notes
+        id: notes
+        shell: bash
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          NOTES_FILE="dist/release_notes.md"
+          
+          # Find previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || echo "")
+          
+          echo "## XO Game ${TAG}" > "$NOTES_FILE"
+          echo "" >> "$NOTES_FILE"
+          
+          CUSTOM="${{ steps.meta.outputs.custom_notes }}"
+          if [ -n "$CUSTOM" ]; then
+            echo "$CUSTOM" >> "$NOTES_FILE"
+            echo "" >> "$NOTES_FILE"
+          fi
+          
+          echo "### Changes" >> "$NOTES_FILE"
+          if [ -n "$PREV_TAG" ]; then
+            echo "Changes since **$PREV_TAG**:" >> "$NOTES_FILE"
+            git log "${PREV_TAG}..HEAD" --oneline --no-merges | sed 's/^/* /' >> "$NOTES_FILE"
+          else
+            echo "Initial release changes:" >> "$NOTES_FILE"
+            git log -n 15 --oneline --no-merges | sed 's/^/* /' >> "$NOTES_FILE"
+          fi
+          
+          cat "$NOTES_FILE"
+
+      - name: Generate Public Update Manifest
+        shell: bash
+        run: |
+          ZIP_NAME="XO_Game-${{ steps.meta.outputs.tag }}-windows-x64.zip"
+          ZIP_SHA256=$(grep "$ZIP_NAME" dist/checksums.txt | awk '{print $1}')
+          
+          MANDATORY_FLAG=""
+          if [ "${{ steps.meta.outputs.mandatory }}" = "true" ]; then
+            MANDATORY_FLAG="--mandatory"
+          fi
+          
+          MIN_VER_FLAG=""
+          if [ -n "${{ steps.meta.outputs.min_supported_version }}" ]; then
+            MIN_VER_FLAG="--min-supported-version ${{ steps.meta.outputs.min_supported_version }}"
+          fi
+          
+          # Generate version.json for the release bundle
+          python scripts/generate_manifest.py \
+            --version "${{ steps.meta.outputs.version }}" \
+            --channel "${{ steps.meta.outputs.channel }}" \
+            --repo "${{ github.repository }}" \
+            --tag "${{ steps.meta.outputs.tag }}" \
+            --notes-file "dist/release_notes.md" \
+            --file-name "$ZIP_NAME" \
+            --sha256 "$ZIP_SHA256" \
+            --output "dist/version.json" \
+            $MANDATORY_FLAG \
+            $MIN_VER_FLAG
+
+          # If stable channel, also update docs/updates/version.json for GitHub Pages
+          if [ "${{ steps.meta.outputs.channel }}" = "stable" ]; then
+            mkdir -p docs/updates
+            cp dist/version.json docs/updates/version.json
+          else
+            # For prereleases, save as prerelease.json
+            cp dist/version.json dist/prerelease.json
+          fi
+
+      - name: Publish GitHub Release
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          PRERELEASE_FLAG=""
+          if [ "${{ steps.meta.outputs.is_prerelease }}" = "true" ]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+          
+          ZIP_NAME="XO_Game-${TAG}-windows-x64.zip"
+          
+          # Use GitHub CLI to create or update release
+          gh release create "$TAG" \
+            "dist/XO_Game.exe" \
+            "dist/$ZIP_NAME" \
+            "dist/checksums.txt" \
+            "dist/version.json" \
+            --title "XO Game $TAG" \
+            --notes-file "dist/release_notes.md" \
+            $PRERELEASE_FLAG \
+            --clobber
+
+      - name: Update Static Manifest in Repository (Stable Releases)
+        if: steps.meta.outputs.channel == 'stable'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/updates/version.json
+          if git diff --staged --quiet; then
+            echo "No changes to docs/updates/version.json"
+          else
+            git commit -m "chore(release): update public version manifest for ${{ steps.meta.outputs.tag }} [skip ci]"
+            git push origin HEAD:main
+          fi

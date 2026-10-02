@@ -8,17 +8,23 @@ Multiplayer support added - 2024
 """
 
 import webbrowser
+from typing import Optional
 from tkinter import Tk, PhotoImage, Button, Frame, Canvas
 from tkinter import messagebox as msg
 from os import path
 
 from config import (
+    __version__,
     WINDOW_TITLE, ICON_PATH,
     PLAY_BUTTON_TEXT, EXIT_BUTTON_TEXT,
     TITLE_FONT, BUTTON_FONT, BUTTON_PADDING_X,
     CHANGE_THEME_TEXT, ABOUT_TEXT, EXIT_MENU_TEXT, HELP_MENU_TEXT,
     MENU_TEAROFF, UI_SETUP_DELAY,
-    ABOUT_TITLE, ABOUT_MESSAGE, FEEDBACK_TITLE, FEEDBACK_MESSAGE, GITHUB_URL
+    ABOUT_TITLE, ABOUT_MESSAGE, FEEDBACK_TITLE, FEEDBACK_MESSAGE, GITHUB_URL,
+    CHECK_UPDATES_MENU_TEXT,
+    UP_TO_DATE_TITLE, UP_TO_DATE_MESSAGE,
+    UPDATE_CHECK_ERROR_TITLE, UPDATE_CHECK_ERROR_MESSAGE,
+    GITHUB_RELEASES_API
 )
 from network_config import (
     MULTIPLAYER_BUTTON_TEXT,
@@ -32,11 +38,13 @@ from views.game_view import GameView
 from views.widgets.title_label import create_title_label
 from views.widgets.play_button import create_play_button
 from views.widgets.help_menu import create_help_menu
+from views.widgets.update_dialog import UpdateNotifierDialog
 from views.widgets.multiplayer_dialogs import (
     MultiplayerModeDialog, HostGameDialog, JoinGameDialog
 )
 from network.server import GameServer
 from network.client import GameClient
+from utils.updater import UpdateService, UpdateManifest
 
 
 class TicTacToeApp:
@@ -75,9 +83,18 @@ class TicTacToeApp:
         # Create UI
         self._create_ui()
         
+        # Update Service
+        self.update_service = UpdateService(current_version=__version__)
+        
         # Connection status indicator (hidden initially)
         self._status_canvas = None
         self._status_circle = None
+        
+        # Check for updates in background shortly after startup
+        self.root.after(2000, self._check_updates_silent)
+        
+        # Bind window focus event for foreground lifecycle checks (with cooldown)
+        self.root.bind("<FocusIn>", self._on_window_focus_in)
     
     def _set_icon(self):
         """Set the window icon."""
@@ -130,7 +147,9 @@ class TicTacToeApp:
             ABOUT_TEXT,
             EXIT_MENU_TEXT,
             HELP_MENU_TEXT,
-            MENU_TEAROFF
+            MENU_TEAROFF,
+            check_updates_command=self._check_updates_manual,
+            CHECK_UPDATES_MENU_TEXT=CHECK_UPDATES_MENU_TEXT
         )
     
     def _create_connection_indicator(self):
@@ -426,6 +445,54 @@ class TicTacToeApp:
         
         if msg.askyesno(FEEDBACK_TITLE, FEEDBACK_MESSAGE):
             webbrowser.open(GITHUB_URL)
+    
+    def _on_window_focus_in(self, event=None):
+        """Lifecycle hook when window returns to foreground. Checks with cooldown."""
+        if event and event.widget != self.root:
+            return
+        self.update_service.check_on_foreground(on_result=self._on_update_result_silent)
+    
+    def _check_updates_silent(self):
+        """Silently check for updates on startup without blocking gameplay."""
+        self.update_service.check_async(is_manual=False, on_result=self._on_update_result_silent)
+    
+    def _on_update_result_silent(
+        self,
+        has_update: bool,
+        is_mandatory: bool,
+        manifest: Optional[UpdateManifest],
+        error: Optional[str]
+    ):
+        """Handle silent background update check result."""
+        if has_update and manifest:
+            self.root.after(0, lambda: self._show_update_dialog(manifest, is_mandatory))
+    
+    def _check_updates_manual(self):
+        """Manually check for updates when invoked from Help menu."""
+        def on_result(
+            has_update: bool,
+            is_mandatory: bool,
+            manifest: Optional[UpdateManifest],
+            error: Optional[str]
+        ):
+            if has_update and manifest:
+                self.root.after(0, lambda: self._show_update_dialog(manifest, is_mandatory))
+            elif error:
+                self.root.after(0, lambda: msg.showwarning(UPDATE_CHECK_ERROR_TITLE, UPDATE_CHECK_ERROR_MESSAGE))
+            else:
+                self.root.after(0, lambda: msg.showinfo(UP_TO_DATE_TITLE, UP_TO_DATE_MESSAGE))
+        
+        self.update_service.check_async(is_manual=True, on_result=on_result)
+    
+    def _show_update_dialog(self, manifest: UpdateManifest, is_mandatory: bool = False):
+        """Display the update notification dialog."""
+        UpdateNotifierDialog(
+            parent=self.root,
+            current_version=__version__,
+            manifest=manifest,
+            is_mandatory=is_mandatory,
+            on_dismiss=self.update_service.dismiss_update
+        )
     
     def run(self):
         """Run the application main loop."""

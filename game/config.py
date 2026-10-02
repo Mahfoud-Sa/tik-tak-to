@@ -105,6 +105,19 @@ ABOUT_MESSAGE = f'لعبة إكس أو بسيطة\nالإصدار: {__version__}
 FEEDBACK_TITLE = 'التقييم'
 FEEDBACK_MESSAGE = 'هل أعجبتك هذه اللعبة؟\nامنحني نجمة على مستودع GitHub!'
 
+# Update Notification Constants
+CHECK_UPDATES_MENU_TEXT = 'التحقق من وجود تحديثات...'
+UPDATE_AVAILABLE_TITLE = 'تحديث جديد متوفر!'
+UPDATE_DIALOG_HEADING = 'إصدار جديد متوفر من لعبة إكس أو'
+CURRENT_VERSION_LABEL = 'الإصدار الحالي:'
+LATEST_VERSION_LABEL = 'أحدث إصدار:'
+DOWNLOAD_UPDATE_BUTTON_TEXT = 'تحميل التحديث'
+LATER_BUTTON_TEXT = 'لاحقاً'
+UP_TO_DATE_TITLE = 'أنت على أحدث إصدار'
+UP_TO_DATE_MESSAGE = f'أنت تستخدم بالفعل أحدث إصدار من اللعبة (v{__version__}).'
+UPDATE_CHECK_ERROR_TITLE = 'تعذر التحقق من التحديثات'
+UPDATE_CHECK_ERROR_MESSAGE = 'تعذر الاتصال بخادم التحديثات.\nيرجى التحقق من اتصالك بالإنترنت والمحاولة لاحقاً.'
+
 # =============================================================================
 # FONT CONSTANTS
 # =============================================================================
@@ -149,6 +162,8 @@ ICON_PATH = 'assets/icons/icon.png'
 # URL CONSTANTS
 # =============================================================================
 GITHUB_URL = 'https://github.com/Mahfoud-Sa/XO_Game.git'
+GITHUB_RELEASES_PAGE = 'https://github.com/Mahfoud-Sa/XO_Game/releases'
+GITHUB_RELEASES_API = 'https://api.github.com/repos/Mahfoud-Sa/XO_Game/releases/latest'
 
 # =============================================================================
 # LAYOUT CONSTANTS
