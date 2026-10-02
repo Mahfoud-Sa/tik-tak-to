@@ -167,6 +167,14 @@
     return emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
   }
 
+  function getLocalizedText(key, fallback) {
+    if (window.XOI18n && typeof window.XOI18n.t === 'function') {
+      const res = window.XOI18n.t(key);
+      if (res && res !== key) return res;
+    }
+    return fallback;
+  }
+
   // Make Move
   function makeMove(index) {
     if (state.isGameOver || state.board[index] !== null) return false;
@@ -180,7 +188,10 @@
       handleGameOver(result);
     } else {
       state.currentPlayer = state.currentPlayer === 'X' ? 'O' : 'X';
-      updateStatus(`${state.currentPlayer}'s turn`);
+      const turnMsg = state.currentPlayer === 'X' 
+        ? getLocalizedText('turnX', "Player X's turn") 
+        : getLocalizedText('turnO', "Player O's turn");
+      updateStatus(turnMsg);
 
       // If AI mode and O's turn, schedule AI move
       if (state.mode === 'ai' && state.currentPlayer === 'O') {
@@ -208,16 +219,16 @@
     if (result.winner === 'tie') {
       state.scores.ties++;
       playSound('tie');
-      updateStatus("It's a draw!", 'tie');
+      updateStatus(getLocalizedText('winTie', "It's a draw!"), 'tie');
     } else {
       if (result.winner === 'X') {
         state.scores.x++;
         playSound('win');
-        updateStatus("Player X Wins!", 'win-x');
+        updateStatus(getLocalizedText('winX', "Player X Wins!"), 'win-x');
       } else {
         state.scores.o++;
         playSound('win');
-        updateStatus("Player O Wins!", 'win-o');
+        updateStatus(getLocalizedText('winO', "Player O Wins!"), 'win-o');
       }
     }
 
@@ -290,8 +301,21 @@
     state.isGameOver = false;
     state.winningCombo = null;
     playSound('click');
-    updateStatus("Player X's turn");
+    updateStatus(getLocalizedText('turnX', "Player X's turn"));
     render();
+  }
+
+  // Update status when language changes
+  if (window.XOI18n && typeof window.XOI18n.onLanguageChange === 'function') {
+    window.XOI18n.onLanguageChange(() => {
+      if (!state.isGameOver) {
+        const turnMsg = state.currentPlayer === 'X' 
+          ? getLocalizedText('turnX', "Player X's turn") 
+          : getLocalizedText('turnO', "Player O's turn");
+        updateStatus(turnMsg);
+      }
+      render();
+    });
   }
 
   function resetScores() {
