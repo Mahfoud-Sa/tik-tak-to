@@ -16,11 +16,11 @@ from unittest.mock import patch, MagicMock
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'game')))
 
 try:
-    from utils.updater import UpdateManifest, UpdateService, DownloadCancellationToken
     from views.widgets.update_dialog import UpdateNotifierDialog
+    from utils.updater import UpdateManifest, UpdateService, DownloadCancellationToken
 except ImportError:
-    from game.utils.updater import UpdateManifest, UpdateService, DownloadCancellationToken
     from game.views.widgets.update_dialog import UpdateNotifierDialog
+    from game.utils.updater import UpdateManifest, UpdateService, DownloadCancellationToken
 
 
 class TestUpdateDialogUI(unittest.TestCase):
@@ -42,44 +42,48 @@ class TestUpdateDialogUI(unittest.TestCase):
             mandatory=False
         )
 
-    @patch('views.widgets.update_dialog.webbrowser.open')
-    @patch('views.widgets.update_dialog.msg.showinfo')
-    @patch('views.widgets.update_dialog.Toplevel')
-    @patch('views.widgets.update_dialog.Tk', create=True)
-    def test_dev_mode_guardrail_opens_browser(
-        self, mock_tk, mock_toplevel, mock_msg, mock_web_open
-    ):
+    def _create_test_dialog(self, mock_service):
         parent = MagicMock()
-        mock_service = MagicMock(spec=UpdateService)
-
-        with patch.object(sys, 'frozen', False, create=True):
+        with patch('views.widgets.update_dialog.Toplevel'), \
+             patch.object(UpdateNotifierDialog, '_center_window'), \
+             patch.object(UpdateNotifierDialog, '_set_icon'), \
+             patch.object(UpdateNotifierDialog, '_create_ui'):
             dialog = UpdateNotifierDialog(
                 parent=parent,
                 current_version="3.0.0",
                 manifest=self.manifest,
                 update_service=mock_service
             )
+            dialog.download_btn = MagicMock()
+            dialog.later_btn = MagicMock()
+            dialog.btn_frame = MagicMock()
+            return dialog
+
+    @patch('views.widgets.update_dialog.webbrowser.open')
+    @patch('views.widgets.update_dialog.msg.showinfo')
+    def test_dev_mode_guardrail_opens_browser(
+        self, mock_msg, mock_web_open
+    ):
+        mock_service = MagicMock(spec=UpdateService)
+
+        with patch.object(sys, 'frozen', False, create=True):
+            dialog = self._create_test_dialog(mock_service)
             dialog._on_download()
 
             # Assert browser was opened and no in-app download was started
             mock_web_open.assert_called_once()
             mock_service.download_update_async.assert_not_called()
 
-    @patch('views.widgets.update_dialog.Toplevel')
-    @patch('views.widgets.update_dialog.Tk', create=True)
+    @patch('views.widgets.update_dialog.Label')
+    @patch('views.widgets.update_dialog.Button')
+    @patch('views.widgets.update_dialog.ttk.Progressbar')
     def test_frozen_mode_transforms_ui_and_starts_download(
-        self, mock_tk, mock_toplevel
+        self, mock_pb, mock_btn, mock_lbl
     ):
-        parent = MagicMock()
         mock_service = MagicMock(spec=UpdateService)
 
         with patch.object(sys, 'frozen', True, create=True):
-            dialog = UpdateNotifierDialog(
-                parent=parent,
-                current_version="3.0.0",
-                manifest=self.manifest,
-                update_service=mock_service
-            )
+            dialog = self._create_test_dialog(mock_service)
             dialog._on_download()
 
             # Assert async download was triggered
@@ -87,21 +91,16 @@ class TestUpdateDialogUI(unittest.TestCase):
             self.assertTrue(dialog._is_downloading)
             self.assertIsNotNone(dialog._cancel_token)
 
-    @patch('views.widgets.update_dialog.Toplevel')
-    @patch('views.widgets.update_dialog.Tk', create=True)
+    @patch('views.widgets.update_dialog.Label')
+    @patch('views.widgets.update_dialog.Button')
+    @patch('views.widgets.update_dialog.ttk.Progressbar')
     def test_cancel_download_restores_buttons(
-        self, mock_tk, mock_toplevel
+        self, mock_pb, mock_btn, mock_lbl
     ):
-        parent = MagicMock()
         mock_service = MagicMock(spec=UpdateService)
 
         with patch.object(sys, 'frozen', True, create=True):
-            dialog = UpdateNotifierDialog(
-                parent=parent,
-                current_version="3.0.0",
-                manifest=self.manifest,
-                update_service=mock_service
-            )
+            dialog = self._create_test_dialog(mock_service)
             dialog._on_download()
             self.assertTrue(dialog._is_downloading)
 

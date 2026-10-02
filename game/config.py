@@ -91,7 +91,7 @@ UI_SETUP_DELAY = 40  # milliseconds
 # =============================================================================
 # TEXT CONSTANTS (Arabic)
 # =============================================================================
-WINDOW_TITLE = 'لعبة إكس أو'
+WINDOW_TITLE = 'لعبة XO'
 PLAY_BUTTON_TEXT = 'ابدأ اللعب'
 EXIT_BUTTON_TEXT = 'خروج'
 CHANGE_THEME_TEXT = 'تغيير السمة'
@@ -100,15 +100,15 @@ EXIT_MENU_TEXT = 'خروج'
 HELP_MENU_TEXT = 'مساعدة'
 
 # About dialog
-ABOUT_TITLE = 'حول لعبة إكس أو'
-ABOUT_MESSAGE = f'لعبة إكس أو بسيطة\nالإصدار: {__version__}\nتم تطويرها بواسطة المهندس محفوظ محمد بن سباح\n2020 - 2024'
+ABOUT_TITLE = 'حول لعبة XO'
+ABOUT_MESSAGE = f'لعبة XO بسيطة\nالإصدار: {__version__}\nتم تطويرها بواسطة المهندس محفوظ محمد بن سباح\n2020 - 2026'
 FEEDBACK_TITLE = 'التقييم'
 FEEDBACK_MESSAGE = 'هل أعجبتك هذه اللعبة؟\nامنحني نجمة على مستودع GitHub!'
 
 # Update Notification Constants
 CHECK_UPDATES_MENU_TEXT = 'التحقق من وجود تحديثات...'
 UPDATE_AVAILABLE_TITLE = 'تحديث جديد متوفر!'
-UPDATE_DIALOG_HEADING = 'إصدار جديد متوفر من لعبة إكس أو'
+UPDATE_DIALOG_HEADING = 'إصدار جديد متوفر من لعبة XO'
 CURRENT_VERSION_LABEL = 'الإصدار الحالي:'
 LATEST_VERSION_LABEL = 'أحدث إصدار:'
 DOWNLOAD_UPDATE_BUTTON_TEXT = 'تحميل التحديث'

@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/Mahfoud-Sa/tik-tak-to/main/schemas/version-manifest.schema.json",
   "schema_version": 1,
-  "name": "XO Game",
+  "name": "Tik Tak Tok",
   "version": "3.0.1",
   "tag_name": "v3.0.1",
   "channel": "stable",

@@ -1,5 +1,5 @@
 """
-Auto-Update Engine for XO Game
+Auto-Update Engine for Tik Tak Tok (لعبة XO)
 Implements SemVer 2.0.0 parsing & comparison, public update manifest ingestion,
 persistent dismissal tracking, channel filtering, and async lifecycle checks.
 """
@@ -203,7 +203,7 @@ class UpdateManifest:
         
         return cls(
             schema_version=data.get("schema_version", 1),
-            name=data.get("name", "XO Game"),
+            name=data.get("name", "Tik Tak Tok"),
             version=data.get("version", "").lstrip("vV"),
             tag_name=data.get("tag_name") or f"v{data.get('version', '')}",
             channel=data.get("channel", "stable"),
@@ -211,7 +211,7 @@ class UpdateManifest:
             release_notes=data.get("release_notes", ""),
             release_page_url=data.get("release_page_url", ""),
             download_url=win_info.get("download_url", data.get("release_page_url", "")),
-            file_name=win_info.get("file_name", "XO_Game-windows-x64.zip"),
+            file_name=win_info.get("file_name", "Tik_Tak_Tok-windows-x64.zip"),
             sha256=win_info.get("sha256", ""),
             min_supported_version=data.get("min_supported_version"),
             mandatory=bool(data.get("mandatory", False))
@@ -659,12 +659,13 @@ def stage_executable_from_zip(zip_path: str, destination_dir: Optional[str] = No
     with zipfile.ZipFile(zip_path, "r") as zf:
         exe_member = None
         for name in zf.namelist():
-            if os.path.basename(name).lower() == "xo_game.exe":
+            base = os.path.basename(name).lower()
+            if base in ("tik tak tok.exe", "tik_tak_tok.exe", "xo_game.exe", "xo game.exe"):
                 exe_member = name
                 break
 
         if not exe_member:
-            raise FileNotFoundError("XO_Game.exe was not found inside the update package.")
+            raise FileNotFoundError("Executable was not found inside the update package.")
 
         extracted_path = zf.extract(exe_member, stage_dir)
         return os.path.abspath(extracted_path)
@@ -673,10 +674,14 @@ def stage_executable_from_zip(zip_path: str, destination_dir: Optional[str] = No
 def generate_updater_batch_script(pid: int, staged_exe: str, target_exe: str) -> str:
     """
     Generate a Windows batch updater script that waits for process PID to exit,
-    replaces the target executable with the staged binary, relaunches the game,
-    and cleans up artifacts.
+    terminates lingering game processes, replaces the target executable with the
+    staged binary, cleans up legacy executables, relaunches the game, and self-destructs.
     """
     staged_dir = os.path.dirname(staged_exe)
+    target_dir = os.path.dirname(target_exe)
+    legacy_exe = os.path.join(target_dir, "XO Game.exe")
+    legacy_exe_alt = os.path.join(target_dir, "XO_Game.exe")
+
     batch_content = f"""@echo off
 setlocal enabledelayedexpansion
 chcp 65001 >nul
@@ -689,6 +694,11 @@ if !ERRORLEVEL! equ 0 (
     goto wait_loop
 )
 
+:: Terminate any lingering legacy or current game processes
+taskkill /f /im "XO Game.exe" >nul 2>&1
+taskkill /f /im "XO_Game.exe" >nul 2>&1
+taskkill /f /im "Tik Tak Tok.exe" >nul 2>&1
+
 :: Brief pause to ensure OS releases file locks
 timeout /t 1 /nobreak >nul
 
@@ -697,6 +707,10 @@ copy /y "{staged_exe}" "{target_exe}" >nul
 if !ERRORLEVEL! neq 0 (
     move /y "{staged_exe}" "{target_exe}" >nul
 )
+
+:: Clean up legacy executable if upgrading from older version
+if exist "{legacy_exe}" if /i "{legacy_exe}" neq "{target_exe}" del /f /q "{legacy_exe}" >nul 2>&1
+if exist "{legacy_exe_alt}" if /i "{legacy_exe_alt}" neq "{target_exe}" del /f /q "{legacy_exe_alt}" >nul 2>&1
 
 :: Clean up staging directory
 rmdir /s /q "{staged_dir}" 2>nul

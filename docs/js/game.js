@@ -1,5 +1,5 @@
 /**
- * XO Game - Accessible In-Browser Playable Game Engine
+ * Tik Tak Tok - Accessible In-Browser Playable Game Engine
  * Implements 3x3 Tic-Tac-Toe with Pass & Play and Single Player vs AI,
  * synthesized Web Audio, full keyboard navigation, themes, and score tracking.
  */

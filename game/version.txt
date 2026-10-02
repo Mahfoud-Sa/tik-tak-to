@@ -15,12 +15,12 @@ VSVersionInfo(
       StringTable(
         u'040904b0',
         [StringStruct(u'CompanyName', u'Mahfoud'),
-        StringStruct(u'FileDescription', u'XO Game'),
+        StringStruct(u'FileDescription', u'Tik Tak Tok'),
         StringStruct(u'FileVersion', u'3.0.1'),
-        StringStruct(u'InternalName', u'XO Game'),
-        StringStruct(u'LegalCopyright', u'Copyright (c) 2024'),
-        StringStruct(u'OriginalFilename', u'XO_Game.exe'),
-        StringStruct(u'ProductName', u'XO Game'),
+        StringStruct(u'InternalName', u'Tik Tak Tok'),
+        StringStruct(u'LegalCopyright', u'Copyright (c) 2026'),
+        StringStruct(u'OriginalFilename', u'Tik Tak Tok.exe'),
+        StringStruct(u'ProductName', u'Tik Tak Tok'),
         StringStruct(u'ProductVersion', u'3.0.1')])
       ]), 
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])

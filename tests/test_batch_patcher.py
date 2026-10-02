@@ -19,13 +19,13 @@ from unittest.mock import patch, MagicMock
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'game')))
 
 try:
-    from utils.updater import (
+    from game.utils.updater import (
         generate_updater_batch_script,
         stage_executable_from_zip,
         apply_in_place_update
     )
 except ImportError:
-    from game.utils.updater import (
+    from utils.updater import (
         generate_updater_batch_script,
         stage_executable_from_zip,
         apply_in_place_update
@@ -84,6 +84,23 @@ class TestBatchPatcher(unittest.TestCase):
         self.assertIn(f'copy /y "{staged_exe}" "{target_exe}"', script)
         self.assertIn(f'start "" "{target_exe}"', script)
         self.assertIn("del", script)
+        self.assertIn('taskkill /f /im "XO Game.exe"', script)
+        self.assertIn('taskkill /f /im "Tik Tak Tok.exe"', script)
+
+    def test_stage_executable_from_zip_tik_tak_tok(self):
+        new_zip = os.path.join(self.temp_dir.name, "tik_tak_tok_update.zip")
+        with zipfile.ZipFile(new_zip, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("Tik Tak Tok.exe", self.dummy_exe_content)
+
+        staged_exe = stage_executable_from_zip(new_zip)
+        self.assertTrue(os.path.exists(staged_exe))
+        try:
+            with open(staged_exe, "rb") as f:
+                content = f.read()
+            self.assertEqual(content, self.dummy_exe_content)
+        finally:
+            if os.path.exists(staged_exe):
+                os.remove(staged_exe)
 
     @patch('utils.updater.webbrowser.open')
     def test_apply_in_place_update_dev_mode_guardrail(self, mock_web_open):

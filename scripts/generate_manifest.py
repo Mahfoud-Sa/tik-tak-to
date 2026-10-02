@@ -118,7 +118,7 @@ def generate_manifest(
     min_supported_version: str = "",
     mandatory: bool = False,
     download_url: str = "",
-    file_name: str = "XO_Game-windows-x64.zip",
+    file_name: str = "Tik_Tak_Tok-windows-x64.zip",
     sha256: str = "",
     output_path: str = "version.json",
     history_path: str = ""
@@ -141,7 +141,7 @@ def generate_manifest(
     manifest = {
         "$schema": f"https://raw.githubusercontent.com/{repo}/main/schemas/version-manifest.schema.json",
         "schema_version": 1,
-        "name": f"XO Game {tag}",
+        "name": f"Tik Tak Tok {tag}",
         "version": norm_version,
         "tag_name": tag,
         "channel": channel,

@@ -1,5 +1,5 @@
 /**
- * XO Game - Version History Management & Rendering
+ * Tik Tak Tok - Version History Management & Rendering
  * Shared release data consumer with category grouping (Added/Improved/Fixed),
  * bilingual localization (English / Arabic), dark/light theme support,
  * deep-linking (#v3.0.1), channel filtering, pagination, and safe HTML rendering.
@@ -269,7 +269,7 @@
         >
           <header class="release-card-header">
             <div class="release-meta-main">
-              <h2 class="release-version-heading">${escapeHtml(release.name || ('XO Game ' + release.tag_name))}</h2>
+              <h2 class="release-version-heading">${escapeHtml(release.name || ('Tik Tak Tok ' + release.tag_name))}</h2>
               ${isLatest ? `<span class="badge badge-stable"><span class="badge-dot"></span> ${escapeHtml(stableLabel)}</span>` : ''}
               ${isPrerelease ? `<span class="badge badge-prerelease"><span class="badge-dot"></span> ${escapeHtml(prereleaseLabel)}</span>` : ''}
               <time class="release-published-date" datetime="${escapeHtml(release.published_at)}">

@@ -1,5 +1,5 @@
 /**
- * XO Game - Landing Page Interactions, Theme Engine & Release Hydration
+ * Tik Tak Tok - Landing Page Interactions, Theme Engine & Release Hydration
  */
 
 (function () {
@@ -61,7 +61,7 @@
     // 2. Latest Release Highlight Card
     const relTagTitle = document.getElementById('latest-release-tag');
     if (relTagTitle) {
-      relTagTitle.textContent = release.name || `XO Game ${tag}`;
+      relTagTitle.textContent = release.name || `Tik Tak Tok ${tag}`;
     }
 
     const relDate = document.getElementById('latest-release-date');

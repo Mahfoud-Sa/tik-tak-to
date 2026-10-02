@@ -18,9 +18,9 @@ from unittest.mock import patch, MagicMock
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'game')))
 
 try:
-    from utils.i18n import I18n, i18n
-except ImportError:
     from game.utils.i18n import I18n, i18n
+except ImportError:
+    from utils.i18n import I18n, i18n
 
 
 class TestI18n(unittest.TestCase):
@@ -38,13 +38,15 @@ class TestI18n(unittest.TestCase):
     def test_default_language_is_arabic(self):
         self.assertEqual(self.i18n_instance.get_language(), "ar")
         self.assertEqual(self.i18n_instance.t("PLAY_BUTTON_TEXT"), "ابدأ اللعب")
-        self.assertEqual(self.i18n_instance.t("WINDOW_TITLE"), "لعبة إكس أو")
+        self.assertEqual(self.i18n_instance.t("WINDOW_TITLE"), "لعبة XO")
+        self.assertEqual(self.i18n_instance.t("ABOUT_TITLE"), "حول لعبة XO")
 
     def test_switch_to_english(self):
         self.i18n_instance.set_language("en")
         self.assertEqual(self.i18n_instance.get_language(), "en")
         self.assertEqual(self.i18n_instance.t("PLAY_BUTTON_TEXT"), "Play Game")
-        self.assertEqual(self.i18n_instance.t("WINDOW_TITLE"), "XO Game")
+        self.assertEqual(self.i18n_instance.t("WINDOW_TITLE"), "Tik Tak Tok")
+        self.assertEqual(self.i18n_instance.t("ABOUT_TITLE"), "About Tik Tak Tok")
         self.assertEqual(self.i18n_instance.t("MULTIPLAYER_BUTTON_TEXT"), "Multiplayer")
 
     def test_toggle_language(self):
@@ -90,6 +92,29 @@ class TestI18n(unittest.TestCase):
         new_instance = I18n(settings_file=self.temp_settings.name)
         self.assertEqual(new_instance.get_language(), "en")
 
+    def test_legacy_settings_migration(self):
+        legacy_temp = tempfile.NamedTemporaryFile(delete=False, mode="w", encoding="utf-8")
+        legacy_temp.write('{"language": "en"}')
+        legacy_temp.close()
+
+        new_settings_path = os.path.join(tempfile.gettempdir(), f"test_migrated_{os.getpid()}.json")
+        if os.path.exists(new_settings_path):
+            os.remove(new_settings_path)
+
+        try:
+            # Create instance pointing to new path with legacy path injected
+            migrated_i18n = I18n(settings_file=new_settings_path)
+            migrated_i18n._legacy_settings_file = legacy_temp.name
+            migrated_i18n._load_preference()
+
+            self.assertEqual(migrated_i18n.get_language(), "en")
+            self.assertTrue(os.path.exists(new_settings_path))
+        finally:
+            if os.path.exists(legacy_temp.name):
+                os.remove(legacy_temp.name)
+            if os.path.exists(new_settings_path):
+                os.remove(new_settings_path)
+
     def test_directionality_helpers_ar(self):
         self.i18n_instance.set_language("ar")
         self.assertTrue(self.i18n_instance.is_rtl)
@@ -128,12 +153,15 @@ class TestAppLanguageSwitch(unittest.TestCase):
     def test_app_toggle_language_updates_ui(
         self, mock_tk, mock_state, mock_ctrl, mock_view, mock_help
     ):
+        import main
         from main import TicTacToeApp
+        app_i18n = main.i18n
         mock_state.return_value.is_game_active = False
+        mock_state.return_value.game_active = False
         app = TicTacToeApp()
 
         # Set initial language to Arabic
-        i18n.set_language("ar")
+        app_i18n.set_language("ar")
         with patch.object(app.play_button, 'config') as mock_play_cfg, \
              patch.object(app.lang_button, 'config') as mock_lang_cfg:
             app._update_ui_language()
@@ -144,7 +172,7 @@ class TestAppLanguageSwitch(unittest.TestCase):
         with patch.object(app.play_button, 'config') as mock_play_cfg, \
              patch.object(app.lang_button, 'config') as mock_lang_cfg:
             app._toggle_language()
-            self.assertEqual(i18n.get_language(), "en")
+            self.assertEqual(app_i18n.get_language(), "en")
             mock_play_cfg.assert_called_with(text="Play Game")
             mock_lang_cfg.assert_called_with(text="🌐 العربية")
 
@@ -152,7 +180,7 @@ class TestAppLanguageSwitch(unittest.TestCase):
         with patch.object(app.play_button, 'config') as mock_play_cfg, \
              patch.object(app.lang_button, 'config') as mock_lang_cfg:
             app._toggle_language()
-            self.assertEqual(i18n.get_language(), "ar")
+            self.assertEqual(app_i18n.get_language(), "ar")
             mock_play_cfg.assert_called_with(text="ابدأ اللعب")
             mock_lang_cfg.assert_called_with(text="🌐 English")
 

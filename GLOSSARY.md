@@ -1,8 +1,12 @@
-# XO Game
+# Tik Tak Tok (لعبة XO)
 
-A desktop Tic-Tac-Toe application supporting local pass-and-play and LAN/socket multiplayer, with automated version checking and lifecycle management.
+A cross-platform and desktop application supporting local pass-and-play and LAN/socket multiplayer, with automated version checking and bilingual presentation.
 
 ## Language
+
+**Tik Tak Tok (لعبة XO)**:
+The official canonical brand name of the project across English and Arabic editions.
+_Avoid_: XO Game, Tic Tac Toe, tik tak to, لعبة إكس أو
 
 **Update Manifest**:
 A JSON payload hosted on public endpoints defining the latest release metadata, version, platform assets, and mandatory status.

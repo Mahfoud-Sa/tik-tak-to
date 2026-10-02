@@ -12,8 +12,8 @@ from typing import Dict, Any, Callable, List, Optional
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     # Main App & Navigation
     "WINDOW_TITLE": {
-        "ar": "لعبة إكس أو",
-        "en": "XO Game"
+        "ar": "لعبة XO",
+        "en": "Tik Tak Tok"
     },
     "PLAY_BUTTON_TEXT": {
         "ar": "ابدأ اللعب",
@@ -54,12 +54,12 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 
     # About & Feedback
     "ABOUT_TITLE": {
-        "ar": "حول لعبة إكس أو",
-        "en": "About XO Game"
+        "ar": "حول لعبة XO",
+        "en": "About Tik Tak Tok"
     },
     "ABOUT_MESSAGE": {
-        "ar": "لعبة إكس أو بسيطة\nالإصدار: {version}\nتم تطويرها بواسطة المهندس محفوظ محمد بن سباح\n2020 - 2026",
-        "en": "Simple Tic-Tac-Toe Game\nVersion: {version}\nDeveloped by Eng. Mahfoud Mohamed Bensebbah\n2020 - 2026"
+        "ar": "لعبة XO بسيطة\nالإصدار: {version}\nتم تطويرها بواسطة المهندس محفوظ محمد بن سباح\n2020 - 2026",
+        "en": "Simple Tik Tak Tok Game\nVersion: {version}\nDeveloped by Eng. Mahfoud Mohamed Bensebbah\n2020 - 2026"
     },
     "FEEDBACK_TITLE": {
         "ar": "التقييم",
@@ -84,8 +84,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "en": "⚠️ Mandatory Update"
     },
     "UPDATE_DIALOG_HEADING": {
-        "ar": "إصدار جديد متوفر من لعبة إكس أو",
-        "en": "A new version of XO Game is available"
+        "ar": "إصدار جديد متوفر من لعبة XO",
+        "en": "A new version of Tik Tak Tok is available"
     },
     "UPDATE_MANDATORY_HEADING": {
         "ar": "🚨 تحديث إجباري مطلوب!",
@@ -264,25 +264,30 @@ class I18n:
     def __init__(self, settings_file: Optional[str] = None, default_lang: str = "ar"):
         if settings_file is None:
             home = os.path.expanduser("~")
-            self.settings_file = os.path.join(home, ".xo_game_settings.json")
+            self.settings_file = os.path.join(home, ".tik_tak_tok_settings.json")
+            self._legacy_settings_file = os.path.join(home, ".xo_game_settings.json")
         else:
             self.settings_file = settings_file
+            self._legacy_settings_file = None
 
         self._listeners: List[Callable[[], None]] = []
         self._current_lang = default_lang
         self._load_preference()
 
     def _load_preference(self):
-        """Load preferred language from persistent settings file."""
-        if os.path.exists(self.settings_file):
+        """Load preferred language from persistent settings file with legacy migration."""
+        target_file = self.settings_file if os.path.exists(self.settings_file) else self._legacy_settings_file
+        if target_file and os.path.exists(target_file):
             try:
-                with open(self.settings_file, "r", encoding="utf-8") as f:
+                with open(target_file, "r", encoding="utf-8") as f:
                     content = f.read().strip()
                     if content:
                         data = json.loads(content)
                         saved = data.get("language")
                         if saved in self.SUPPORTED_LANGUAGES:
                             self._current_lang = saved
+                            if target_file == self._legacy_settings_file:
+                                self._save_preference()
             except Exception:
                 pass
 

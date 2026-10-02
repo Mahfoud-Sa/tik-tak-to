@@ -41,22 +41,26 @@ def build_release(version: str, tag: str = "", output_dir: str = "dist"):
     if result.returncode != 0:
         raise RuntimeError("PyInstaller build failed!")
     
-    exe_src = os.path.join(game_dir, "dist", "XO_Game.exe")
+    exe_src = os.path.join(game_dir, "dist", "Tik Tak Tok.exe")
     if not os.path.exists(exe_src):
-        raise FileNotFoundError(f"Expected built executable not found at: {exe_src}")
+        exe_src_fallback = os.path.join(game_dir, "dist", "XO_Game.exe")
+        if os.path.exists(exe_src_fallback):
+            exe_src = exe_src_fallback
+        else:
+            raise FileNotFoundError(f"Expected built executable not found at: {exe_src}")
     
     # Copy standalone exe to output directory
-    exe_dest = os.path.join(out_dir, "XO_Game.exe")
+    exe_dest = os.path.join(out_dir, "Tik Tak Tok.exe")
     shutil.copy2(exe_src, exe_dest)
     print(f"Copied {exe_src} -> {exe_dest}")
     
     # 2. Create distribution zip
-    zip_name = f"XO_Game-{tag}-windows-x64.zip"
+    zip_name = f"Tik_Tak_Tok-{tag}-windows-x64.zip"
     zip_path = os.path.join(out_dir, zip_name)
     
     print(f"Packaging {zip_name}...")
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        zf.write(exe_dest, arcname="XO_Game.exe")
+        zf.write(exe_dest, arcname="Tik Tak Tok.exe")
         # Include README if available
         readme_src = os.path.join(game_dir, "README.md")
         if os.path.exists(readme_src):
@@ -70,11 +74,11 @@ def build_release(version: str, tag: str = "", output_dir: str = "dist"):
     
     checksums_file = os.path.join(out_dir, "checksums.txt")
     with open(checksums_file, "w", encoding="utf-8") as f:
-        f.write(f"{exe_hash}  XO_Game.exe\n")
+        f.write(f"{exe_hash}  Tik Tak Tok.exe\n")
         f.write(f"{zip_hash}  {zip_name}\n")
     
     print(f"Checksums saved to: {checksums_file}")
-    print(f"  XO_Game.exe: {exe_hash}")
+    print(f"  Tik Tak Tok.exe: {exe_hash}")
     print(f"  {zip_name}: {zip_hash}")
     
     return {

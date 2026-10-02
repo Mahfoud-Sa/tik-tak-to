@@ -1,5 +1,5 @@
 /**
- * XO Game - Internationalization (i18n) Engine
+ * Tik Tak Tok - Internationalization (i18n) Engine
  * Full bilingual support: English (en) and Arabic (ar)
  * Handles text updates, RTL/LTR layout direction, date localization, and game event hooks.
  */
@@ -10,10 +10,10 @@
   const TRANSLATIONS = {
     en: {
       // Document & Navigation
-      pageTitle: "XO Game - Fast, Modern Tic-Tac-Toe for Web & Windows",
+      pageTitle: "Tik Tak Tok - Fast, Modern Tic-Tac-Toe for Web & Windows",
       pageDescription: "Play Tic-Tac-Toe online in your browser or download the standalone Windows desktop edition with LAN multiplayer, custom themes, and automatic updates.",
       skipLink: "Skip to Game",
-      brandName: "XO Game",
+      brandName: "Tik Tak Tok",
       navPlay: "Play Now",
       navFeatures: "Features",
       navHowToPlay: "How to Play",
@@ -43,7 +43,7 @@
 
       // Play Arena (The Real Game)
       gameTag: "Play In Browser",
-      gameTitle: "Play XO Game Now",
+      gameTitle: "Play Tik Tak Tok Now",
       gameDesc: "Quick, responsive, and fully playable online. Switch between local 2-player Pass & Play or challenge the AI.",
       modePvp: "Pass & Play",
       modeAi: "vs Computer",
@@ -68,7 +68,7 @@
       // Features Section
       featuresTag: "Game Capabilities",
       featuresTitle: "Built for Seamless Play",
-      featuresDesc: "Every feature implemented in the XO Game project across the web and native Windows editions.",
+      featuresDesc: "Every feature implemented in the Tik Tak Tok project across the web and native Windows editions.",
       feat1Title: "Instant 3x3 Grid Engine",
       feat1Desc: "Responsive canvas with immediate win detection across rows, columns, and diagonals, instant draw resolution, synthesized sound effects, and score tracking.",
       feat2Title: "10 Aesthetic Color Themes",
@@ -99,7 +99,7 @@
       // Open Source / Clone Section
       osTag: "Open Source",
       osTitle: "Explore, Clone & Contribute",
-      osDesc: "XO Game is 100% free and open source. Developers can inspect the Python Tkinter desktop source code, the web engine, or build custom packages.",
+      osDesc: "Tik Tak Tok is 100% free and open source. Developers can inspect the Python Tkinter desktop source code, the web engine, or build custom packages.",
       osRepoUrlLabel: "Repository URL",
       osCloneCommandLabel: "Clone Command",
       osCopyBtn: "Copy",
@@ -134,15 +134,15 @@
       footerReleasesManifest: "Releases Manifest (JSON)",
       footerVersionManifest: "Latest Manifest (JSON)",
       footerLicense: "MIT License (docs/LICENSE.txt)",
-      footerCopyright: "© 2026 XO Game. Developed by Mahfoud Mohamed Binsabbah.",
+      footerCopyright: "© 2026 Tik Tak Tok. Developed by Mahfoud Mohamed Binsabbah.",
       footerOpenSourceNote: "Open Source under MIT License.",
 
       // Version History Page
-      versionsPageTitle: "Version History & Release Notes - XO Game",
+      versionsPageTitle: "Version History & Release Notes - Tik Tak Tok",
       versionsBreadcrumbHome: "Home",
       versionsBreadcrumbCurrent: "Version History",
       versionsTitle: "Version History & Releases",
-      versionsDesc: "Explore all stable and prerelease updates for XO Game. Each release includes publication dates, categorized changes, standalone Windows downloads, and cryptographic checksums.",
+      versionsDesc: "Explore all stable and prerelease updates for Tik Tak Tok. Each release includes publication dates, categorized changes, standalone Windows downloads, and cryptographic checksums.",
       filterAll: "All Releases",
       filterStable: "Stable Only",
       filterPrerelease: "Prereleases",
@@ -173,10 +173,10 @@
 
     ar: {
       // Document & Navigation
-      pageTitle: "لعبة إكس أو - تجربة عصرية وسريعة للويب وويندوز",
-      pageDescription: "العب لعبة إكس أو أونلاين في متصفحك أو حمّل النسخة المكتبية المستقلة لويندوز مع اللعب الجماعي عبر الشبكة المحلية والسمات المخصصة والتحديثات التلقائية.",
+      pageTitle: "لعبة XO - تجربة عصرية وسريعة للويب وويندوز",
+      pageDescription: "العب لعبة XO أونلاين في متصفحك أو حمّل النسخة المكتبية المستقلة لويندوز مع اللعب الجماعي عبر الشبكة المحلية والسمات المخصصة والتحديثات التلقائية.",
       skipLink: "الانتقال إلى اللعبة",
-      brandName: "لعبة إكس أو",
+      brandName: "لعبة XO",
       navPlay: "العب الآن",
       navFeatures: "المميزات",
       navHowToPlay: "طريقة اللعب",
@@ -206,7 +206,7 @@
 
       // Play Arena (The Real Game)
       gameTag: "العب في المتصفح",
-      gameTitle: "العب لعبة إكس أو الآن",
+      gameTitle: "العب لعبة XO الآن",
       gameDesc: "سريعة وتفاعلية وقابلة للعب بالكامل في المتصفح. بدّل بين اللعب الثنائي المحلي أو تحدي الحاسوب.",
       modePvp: "لعب ثنائي محلي",
       modeAi: "ضد الكمبيوتر",
@@ -231,7 +231,7 @@
       // Features Section
       featuresTag: "قدرات ومميزات اللعبة",
       featuresTitle: "صُممت لتجربة لعب سلسة",
-      featuresDesc: "جميع المميزات المنفذة فعلياً في مشروع لعبة إكس أو عبر المتصفح ونسخة ويندوز المستقلة.",
+      featuresDesc: "جميع المميزات المنفذة فعلياً في مشروع لعبة XO عبر المتصفح ونسخة ويندوز المستقلة.",
       feat1Title: "محرك شبكة 3×3 فوري",
       feat1Desc: "لوحة تفاعلية مع كشف فوري للفوز عبر الصفوف والأعمدة والأقطار، وحساب التعادل بدقة مع مؤثرات صوتية وتتبع مستمر للنتائج.",
       feat2Title: "10 سمات لونية جذابة",
@@ -262,7 +262,7 @@
       // Open Source / Clone Section
       osTag: "المصدر المفتوح",
       osTitle: "استكشف الكود، واستنسخه، وساهم",
-      osDesc: "مشروع لعبة إكس أو مجاني ومفتوح المصدر بالكامل. يمكن للمطورين استكشاف كود بايثون Tkinter لسطح المكتب، أو محرك الويب، أو بناء حزم مخصصة.",
+      osDesc: "مشروع لعبة XO مجاني ومفتوح المصدر بالكامل. يمكن للمطورين استكشاف كود بايثون Tkinter لسطح المكتب، أو محرك الويب، أو بناء حزم مخصصة.",
       osRepoUrlLabel: "رابط المستودع",
       osCloneCommandLabel: "أمر الاستنساخ",
       osCopyBtn: "نسخ",
@@ -288,7 +288,7 @@
       relDefaultSummary: "يتضمن إصدار ويندوز المكتبي حزمة تنفيذية محمولة ومستقلة، مع إشعارات التحديث التلقائي، واللعب الجماعي عبر المقابس، وتخصيص السمات دون الحاجة لتثبيت بايثون.",
 
       // Footer
-      footerDesc: "مشروع لعبة إكس أو مفتوح المصدر يتميز باللعب عبر المتصفح وتوزيع نسخة سطح المكتب لويندوز واللعب الجماعي عبر الشبكة المحلية ونظام تحديثات تلقائي.",
+      footerDesc: "مشروع لعبة XO مفتوح المصدر يتميز باللعب عبر المتصفح وتوزيع نسخة سطح المكتب لويندوز واللعب الجماعي عبر الشبكة المحلية ونظام تحديثات تلقائي.",
       footerNavHeading: "التنقل",
       footerCodeHeading: "المشروع والكود",
       footerPlayOnline: "العب أونلاين",
@@ -297,15 +297,15 @@
       footerReleasesManifest: "ملف بيانات الإصدارات (JSON)",
       footerVersionManifest: "ملف أحدث إصدار (JSON)",
       footerLicense: "رخصة MIT (ملف docs/LICENSE.txt)",
-      footerCopyright: "© 2026 لعبة إكس أو. تطوير محفوظ محمد بن سباح.",
+      footerCopyright: "© 2026 لعبة XO. تطوير محفوظ محمد بن سباح.",
       footerOpenSourceNote: "مفتوح المصدر بموجب رخصة MIT.",
 
       // Version History Page
-      versionsPageTitle: "سجل الإصدارات وملاحظات التحديث - لعبة إكس أو",
+      versionsPageTitle: "سجل الإصدارات وملاحظات التحديث - لعبة XO",
       versionsBreadcrumbHome: "الرئيسية",
       versionsBreadcrumbCurrent: "سجل الإصدارات",
       versionsTitle: "سجل الإصدارات والتحديثات",
-      versionsDesc: "استكشف كافة التحديثات المستقرة والإصدارات التمهيدية للعبة إكس أو. يتضمن كل إصدار تواريخ النشر والتغييرات المصنفة وتنزيلات ويندوز المستقلة والمجاميع الاختبارية التشفيرية.",
+      versionsDesc: "استكشف كافة التحديثات المستقرة والإصدارات التمهيدية للعبة XO. يتضمن كل إصدار تواريخ النشر والتغييرات المصنفة وتنزيلات ويندوز المستقلة والمجاميع الاختبارية التشفيرية.",
       filterAll: "كافة الإصدارات",
       filterStable: "المستقرة فقط",
       filterPrerelease: "إصدارات تمهيدية",

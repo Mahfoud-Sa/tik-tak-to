@@ -16,9 +16,14 @@ from unittest.mock import MagicMock, patch
 # Add game directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'game')))
 
-from utils.i18n import i18n
-from views.game_view import GameView
-from main import TicTacToeApp
+try:
+    from views.game_view import GameView
+    from utils.i18n import i18n
+    from main import TicTacToeApp
+except ImportError:
+    from game.views.game_view import GameView
+    from game.utils.i18n import i18n
+    from game.main import TicTacToeApp
 
 
 class TestLayoutDirectionality(unittest.TestCase):
