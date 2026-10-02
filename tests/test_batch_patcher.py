@@ -18,11 +18,18 @@ from unittest.mock import patch, MagicMock
 # Add game directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'game')))
 
-from utils.updater import (
-    generate_updater_batch_script,
-    stage_executable_from_zip,
-    apply_in_place_update
-)
+try:
+    from utils.updater import (
+        generate_updater_batch_script,
+        stage_executable_from_zip,
+        apply_in_place_update
+    )
+except ImportError:
+    from game.utils.updater import (
+        generate_updater_batch_script,
+        stage_executable_from_zip,
+        apply_in_place_update
+    )
 
 
 class TestBatchPatcher(unittest.TestCase):

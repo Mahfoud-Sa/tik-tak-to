@@ -15,7 +15,12 @@ from unittest.mock import patch, MagicMock
 # Add game directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'game')))
 
-from utils.updater import UpdateManifest, UpdateService, DownloadCancellationToken
+try:
+    from utils.updater import UpdateManifest, UpdateService, DownloadCancellationToken
+    from views.widgets.update_dialog import UpdateNotifierDialog
+except ImportError:
+    from game.utils.updater import UpdateManifest, UpdateService, DownloadCancellationToken
+    from game.views.widgets.update_dialog import UpdateNotifierDialog
 
 
 class TestUpdateDialogUI(unittest.TestCase):
@@ -44,8 +49,6 @@ class TestUpdateDialogUI(unittest.TestCase):
     def test_dev_mode_guardrail_opens_browser(
         self, mock_tk, mock_toplevel, mock_msg, mock_web_open
     ):
-        from views.widgets.update_dialog import UpdateNotifierDialog
-
         parent = MagicMock()
         mock_service = MagicMock(spec=UpdateService)
 
@@ -67,8 +70,6 @@ class TestUpdateDialogUI(unittest.TestCase):
     def test_frozen_mode_transforms_ui_and_starts_download(
         self, mock_tk, mock_toplevel
     ):
-        from views.widgets.update_dialog import UpdateNotifierDialog
-
         parent = MagicMock()
         mock_service = MagicMock(spec=UpdateService)
 
@@ -91,8 +92,6 @@ class TestUpdateDialogUI(unittest.TestCase):
     def test_cancel_download_restores_buttons(
         self, mock_tk, mock_toplevel
     ):
-        from views.widgets.update_dialog import UpdateNotifierDialog
-
         parent = MagicMock()
         mock_service = MagicMock(spec=UpdateService)
 
