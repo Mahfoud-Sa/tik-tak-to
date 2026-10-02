@@ -200,7 +200,7 @@ jobs:
             MIN_VER_FLAG="--min-supported-version ${{ steps.meta.outputs.min_supported_version }}"
           fi
           
-          # Generate version.json for the release bundle
+          # Generate version.json for the release bundle and update releases.json history
           python scripts/generate_manifest.py \
             --version "${{ steps.meta.outputs.version }}" \
             --channel "${{ steps.meta.outputs.channel }}" \
@@ -210,6 +210,7 @@ jobs:
             --file-name "$ZIP_NAME" \
             --sha256 "$ZIP_SHA256" \
             --output "dist/version.json" \
+            --history-file "docs/updates/releases.json" \
             $MANDATORY_FLAG \
             $MIN_VER_FLAG
 
@@ -260,16 +261,20 @@ jobs:
               $PRERELEASE_FLAG
           fi
 
-      - name: Update Static Manifest in Repository (Stable Releases)
-        if: steps.meta.outputs.channel == 'stable'
+      - name: Update Static Manifests & Release History in Repository
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/updates/version.json
-          if git diff --staged --quiet; then
-            echo "No changes to docs/updates/version.json"
+          if [ "${{ steps.meta.outputs.channel }}" = "stable" ]; then
+            git add docs/updates/version.json docs/updates/releases.json
           else
-            git commit -m "chore(release): update public version manifest for ${{ steps.meta.outputs.tag }} [skip ci]"
+            # For prerelease, update only release history without overwriting latest stable manifest
+            git add docs/updates/releases.json
+          fi
+          if git diff --staged --quiet; then
+            echo "No changes to version manifests or release history."
+          else
+            git commit -m "chore(release): update public release metadata for ${{ steps.meta.outputs.tag }} [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi

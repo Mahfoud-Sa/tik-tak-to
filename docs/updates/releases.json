@@ -1,0 +1,84 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Mahfoud-Sa/tik-tak-to/main/schemas/version-history.schema.json",
+  "schema_version": 1,
+  "latest_stable": "3.0.1",
+  "updated_at": "2026-10-02T08:06:41Z",
+  "releases": [
+    {
+      "name": "XO Game v3.0.1",
+      "version": "3.0.1",
+      "tag_name": "v3.0.1",
+      "channel": "stable",
+      "published_at": "2026-10-02T08:06:41Z",
+      "mandatory": false,
+      "release_notes": "## XO Game v3.0.1\n\n### Added\n* feat: Add in-game update notification system with background check and manual checks\n* feat: Add MVC architecture with local 2-player mode and LAN multiplayer\n* feat: Add PyInstaller build automation and standalone Windows executable packaging\n\n### Improved\n* chore(release): Bump version to 3.0.1 and sync version manifests\n* ci: Add GitHub Actions workflow for automated test, build, and release pipeline\n* docs: Add complete Release and Update Pipeline documentation\n\n### Fixed\n* fix: Resolve version synchronization discrepancies across config and resource files\n",
+      "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v3.0.1",
+      "platforms": {
+        "windows": {
+          "file_name": "XO_Game-v3.0.1-windows-x64.zip",
+          "download_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v3.0.1/XO_Game-v3.0.1-windows-x64.zip",
+          "sha256": "f62675d20c6b2873924be98c20d0749d1ac5aac655ebb7a0a15291234efec81a"
+        }
+      }
+    },
+    {
+      "name": "XO Game v2.5",
+      "version": "2.5.0",
+      "tag_name": "v2.5",
+      "channel": "stable",
+      "published_at": "2024-08-04T16:17:58Z",
+      "mandatory": false,
+      "release_notes": "### Added\n* feat: Add custom high-resolution application icons to the game window and standalone executable\n* feat: Modernize user interface with stylized X and O graphics\n",
+      "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v2.5",
+      "platforms": {
+        "windows": {
+          "file_name": "XO.Game.rar",
+          "download_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v2.5/XO.Game.rar"
+        }
+      }
+    },
+    {
+      "name": "XO v2.0",
+      "version": "2.0.0",
+      "tag_name": "v2",
+      "channel": "stable",
+      "published_at": "2024-07-16T11:10:07Z",
+      "mandatory": false,
+      "release_notes": "### Fixed\n* fix: Resolve executable packaging and runtime library dependency errors\n* fix: Fix window dimension scaling and canvas rendering\n",
+      "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v2",
+      "platforms": {
+        "windows": {
+          "file_name": "xo.rar",
+          "download_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v2/xo.rar"
+        }
+      }
+    },
+    {
+      "name": "create exe file (v1.1)",
+      "version": "1.1.0",
+      "tag_name": "v1.1",
+      "channel": "stable",
+      "published_at": "2024-02-25T07:05:36Z",
+      "mandatory": false,
+      "release_notes": "### Added\n* feat: Initial standalone Windows executable package (`xo-0.4.zip`)\n* feat: Support launching the game without pre-installed Python interpreter\n",
+      "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v1.1",
+      "platforms": {
+        "windows": {
+          "file_name": "xo-0.4.zip",
+          "download_url": "https://github.com/Mahfoud-Sa/XO_Game/files/14395538/xo-0.4.zip"
+        }
+      }
+    },
+    {
+      "name": "Initial Release v1.0",
+      "version": "1.0.0",
+      "tag_name": "v1.0",
+      "channel": "stable",
+      "published_at": "2023-03-31T19:53:17Z",
+      "mandatory": false,
+      "release_notes": "### Added\n* feat: Initial release of Tic-Tac-Toe Python game\n* feat: Interactive 3x3 game board with color themes and winning line detection\n",
+      "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v1.0",
+      "platforms": {}
+    }
+  ]
+}

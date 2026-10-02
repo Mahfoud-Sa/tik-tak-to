@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Version History & Release Notes - XO Game</title>
+  <meta name="description" content="Changelog, release notes, and download packages for XO Game. View the full version history with added features, improvements, and bug fixes.">
+  <meta name="theme-color" content="#070a11">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+  <link rel="apple-touch-icon" href="../img/icon.png">
+
+  <!-- Google Fonts: Outfit (headings) & Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Shared Stylesheet -->
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <!-- Accessibility Skip Link -->
+  <a href="#releases-feed" class="skip-link">Skip to Releases</a>
+
+  <!-- Header & Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="../index.html" class="brand" aria-label="XO Game Home">
+        <div class="brand-icon" aria-hidden="true">
+          <span class="brand-x">X</span>
+          <span class="brand-o">O</span>
+        </div>
+        <span class="brand-text">XO Game</span>
+      </a>
+
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links" id="nav-links">
+          <li><a href="../index.html" class="nav-link">Home</a></li>
+          <li><a href="../index.html#play-arena" class="nav-link">Play Now</a></li>
+          <li><a href="../index.html#features" class="nav-link">Features</a></li>
+          <li><a href="./" class="nav-link active" aria-current="page">Version History</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="../index.html#play-arena" class="btn btn-primary btn-sm">
+          <i class="fas fa-play" aria-hidden="true"></i> Play Online
+        </a>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+          <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- Page Banner -->
+    <section class="page-header" aria-labelledby="versions-title">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="../index.html"><i class="fas fa-home" aria-hidden="true"></i> Home</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">Version History</span>
+        </nav>
+
+        <h1 class="page-title" id="versions-title">Version History & Releases</h1>
+        <p class="page-description">
+          Explore all stable and prerelease updates for XO Game. Each release includes publication dates, categorized changes, standalone Windows downloads, and cryptographic checksums.
+        </p>
+      </div>
+    </section>
+
+    <!-- Version Filtering & Feed -->
+    <section class="container" style="padding-top: 1rem; padding-bottom: 4rem;">
+      <div class="versions-filter-bar">
+        <div class="filter-tabs" role="tablist" aria-label="Release Channel Filters">
+          <button class="filter-tab active" data-filter="all" role="tab" aria-selected="true">
+            All Releases
+          </button>
+          <button class="filter-tab" data-filter="stable" role="tab" aria-selected="false">
+            Stable Only
+          </button>
+          <button class="filter-tab" data-filter="prerelease" role="tab" aria-selected="false">
+            Prereleases
+          </button>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-info-circle" aria-hidden="true"></i>
+          <span>Click <strong>Link</strong> on any version card to copy its permalink.</span>
+        </div>
+      </div>
+
+      <!-- Feed Container (Dynamic rendering with loading skeleton, error and empty states) -->
+      <div id="releases-feed" class="releases-list" aria-live="polite">
+        <!-- Rendered by versions.js -->
+      </div>
+
+      <!-- Pagination / Load More Container -->
+      <div id="pagination-container" class="pagination-container"></div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand-col">
+          <a href="../index.html" class="brand">
+            <div class="brand-icon" aria-hidden="true">
+              <span class="brand-x">X</span>
+              <span class="brand-o">O</span>
+            </div>
+            <span class="brand-text">XO Game</span>
+          </a>
+          <p class="footer-desc">
+            An open-source Tic-Tac-Toe project featuring in-browser play, Windows desktop distribution, socket multiplayer, and an automated release pipeline.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="../index.html" class="footer-link">Home</a></li>
+            <li><a href="../index.html#play-arena" class="footer-link">Play Online</a></li>
+            <li><a href="../index.html#features" class="footer-link">Features</a></li>
+            <li><a href="./" class="footer-link">Version History</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Release Feeds</h4>
+          <ul class="footer-links">
+            <li><a href="../updates/releases.json" class="footer-link" target="_blank"><i class="fas fa-code" aria-hidden="true"></i> releases.json (Full Catalog)</a></li>
+            <li><a href="../updates/version.json" class="footer-link" target="_blank"><i class="fas fa-file-code" aria-hidden="true"></i> version.json (Latest Stable)</a></li>
+            <li><a href="https://github.com/Mahfoud-Sa/tik-tak-to/releases" class="footer-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i> GitHub Releases</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 XO Game. Developed by Mahfoud Mohamed Binsabbah.</p>
+        <p>Open Source under MIT License.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile menu helper script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var btn = document.getElementById('mobile-menu-btn');
+      var menu = document.getElementById('nav-links');
+      if (btn && menu) {
+        btn.addEventListener('click', function() {
+          var isOpen = menu.classList.toggle('is-open');
+          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          btn.innerHTML = isOpen
+            ? '<i class="fas fa-times" aria-hidden="true"></i>'
+            : '<i class="fas fa-bars" aria-hidden="true"></i>';
+        });
+      }
+    });
+  </script>
+  <!-- Release History Engine -->
+  <script src="../js/versions.js"></script>
+</body>
+</html>

@@ -1,67 +1,395 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>XO Game</title>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <meta content="Product Landing Page Template" name="keywords">
-        <meta content="Product Landing Page Template" name="description">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XO Game - Fast, Modern Tic-Tac-Toe for Web & Windows</title>
+  <meta name="description" content="Play Tic-Tac-Toe online in your browser or download the standalone Windows desktop edition with LAN multiplayer, custom themes, and automatic updates.">
+  <meta name="keywords" content="Tic-Tac-Toe, XO Game, Multiplayer, Desktop Game, Tkinter, Python, Web Game">
+  <meta name="theme-color" content="#070a11">
 
-        <!-- Favicon -->
-        <link href="img/favicon.ico" rel="icon">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+  <link rel="apple-touch-icon" href="img/icon.png">
 
-        <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Oswald:wght@400;700&display=swap" rel="stylesheet"> 
+  <!-- Google Fonts: Outfit (headings) & Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
 
-        <!-- CSS Libraries -->
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-        <link href="lib/slick/slick.css" rel="stylesheet">
-        <link href="lib/slick/slick-theme.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-        <!-- Template Stylesheet -->
-        <link href="css/style.css" rel="stylesheet">
-    </head>
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Accessibility Skip Link -->
+  <a href="#play-arena" class="skip-link">Skip to Game</a>
 
-    <body>
-        <!-- Nav Start -->
-        
-           
-
-        <div id="header" style="height: 100vh;width: 100vw;" >
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-6 d-md-none d-block">
-                        <div class="header-img">
-                            <img src="img/product-header.png" width="100vw" height="100vh" alt="Product Image">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="header-content">
-                            <h2>تنزيل لعبتك<br> <span>XO</span>  الان</h2>
-                            <p>
-                                نزل اللعبه عبر رابط مباشر 
-                            </p>
-                            <a class="btn" href="https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v5.0.0/game.rar">Download</a>
-                        </div>
-                    </div>
-                    <div class="col-md-6 d-md-block d-none"> 
-                        <div class="header-img">
-                            <img src="img/product-header.png" alt="Product Image">
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- Header & Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="index.html" class="brand" aria-label="XO Game Home">
+        <div class="brand-icon" aria-hidden="true">
+          <span class="brand-x">X</span>
+          <span class="brand-o">O</span>
         </div>
-       
-        
-        <!-- JavaScript Libraries -->
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-        <script src="lib/easing/easing.min.js"></script>
-        <script src="lib/slick/slick.min.js"></script>
+        <span class="brand-text">XO Game</span>
+      </a>
 
-        <!-- Template Javascript -->
-        <script src="js/main.js"></script>
-    </body>
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links" id="nav-links">
+          <li><a href="#play-arena" class="nav-link trigger-play-now">Play Now</a></li>
+          <li><a href="#features" class="nav-link">Features</a></li>
+          <li><a href="#how-to-play" class="nav-link">How to Play</a></li>
+          <li><a href="#latest-release" class="nav-link">Desktop Edition</a></li>
+          <li><a href="versions/" class="nav-link">Version History</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="#play-arena" class="btn btn-primary btn-sm trigger-play-now">
+          <i class="fas fa-play" aria-hidden="true"></i> Play Now
+        </a>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+          <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <!-- Dynamic Latest Version Pill -->
+          <a href="versions/#v3.0.1" class="version-pill" id="hero-version-pill" title="View Release Notes for Latest Stable Version">
+            <span class="badge badge-stable"><span class="badge-dot"></span> Latest Stable: v3.0.1</span>
+            <span class="pill-date">October 2, 2026</span>
+            <i class="fas fa-chevron-right" style="font-size: 0.75rem;" aria-hidden="true"></i>
+          </a>
+
+          <h1 class="hero-title" id="hero-title">
+            The Classic <span class="highlight-x">X</span> and <span class="highlight-o">O</span> Game, Reimagined.
+          </h1>
+
+          <p class="hero-subtitle">
+            Challenge a friend or test your skills against the computer right in your browser, or download the portable Windows desktop edition with LAN multiplayer and customizable themes.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#play-arena" class="btn btn-primary trigger-play-now">
+              <i class="fas fa-gamepad" aria-hidden="true"></i> Play Now
+            </a>
+            <a href="versions/" class="btn btn-secondary">
+              <i class="fas fa-code-branch" aria-hidden="true"></i> Version History
+            </a>
+            <a href="#latest-release" class="btn btn-outline">
+              <i class="fas fa-download" aria-hidden="true"></i> Windows Download
+            </a>
+          </div>
+        </div>
+
+        <!-- Interactive Hero Grid Card -->
+        <div class="hero-preview-card" aria-hidden="true">
+          <span class="hero-preview-badge">Interactive Preview</span>
+          <div class="preview-board">
+            <button class="preview-cell cell-x" type="button" tabindex="-1">X</button>
+            <button class="preview-cell cell-o" type="button" tabindex="-1">O</button>
+            <button class="preview-cell cell-x" type="button" tabindex="-1">X</button>
+            <button class="preview-cell cell-o" type="button" tabindex="-1">O</button>
+            <button class="preview-cell cell-x" type="button" tabindex="-1">X</button>
+            <button class="preview-cell" type="button" tabindex="-1"></button>
+            <button class="preview-cell cell-o" type="button" tabindex="-1">O</button>
+            <button class="preview-cell" type="button" tabindex="-1"></button>
+            <button class="preview-cell cell-x" type="button" tabindex="-1">X</button>
+          </div>
+          <p class="hero-preview-caption">Tap any preview tile or click <strong>Play Now</strong> to start an instant game!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Playable Game Arena Section (The Actual Game) -->
+    <section class="game-section" id="play-arena" aria-labelledby="arena-title">
+      <div class="container">
+        <header class="section-header">
+          <span class="section-tag">Play In Browser</span>
+          <h2 class="section-title" id="arena-title">Play XO Game Now</h2>
+          <p class="section-desc">
+            Quick, responsive, and fully playable online. Switch between local 2-player Pass & Play or challenge the AI.
+          </p>
+        </header>
+
+        <div class="game-arena">
+          <!-- Toolbar -->
+          <div class="game-toolbar">
+            <div class="mode-selector" role="group" aria-label="Game Mode Selection">
+              <button class="mode-btn active" data-mode="pvp" aria-pressed="true">
+                <i class="fas fa-user-friends" aria-hidden="true"></i> Pass & Play
+              </button>
+              <button class="mode-btn" data-mode="ai" aria-pressed="false">
+                <i class="fas fa-robot" aria-hidden="true"></i> vs Computer
+              </button>
+            </div>
+
+            <div class="game-utility-btns">
+              <button class="tool-btn" id="btn-toggle-sound" title="Toggle Sound Effects" aria-label="Toggle Sound Effects" aria-pressed="true">
+                <i class="fas fa-volume-up" aria-hidden="true"></i>
+              </button>
+              <button class="tool-btn" id="btn-reset-scores" title="Reset Scoreboard" aria-label="Reset Scoreboard">
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Scoreboard -->
+          <div class="game-scoreboard">
+            <div class="player-card player-x active-turn" id="card-player-x">
+              <div class="player-label">
+                <span class="player-symbol">X</span> Player X
+              </div>
+              <div class="player-score" id="score-x">0</div>
+            </div>
+
+            <div class="tie-card">
+              <div class="tie-label">Draws</div>
+              <div class="tie-score" id="score-ties">0</div>
+            </div>
+
+            <div class="player-card player-o" id="card-player-o">
+              <div class="player-label">
+                <span class="player-symbol">O</span> Player O
+              </div>
+              <div class="player-score" id="score-o">0</div>
+            </div>
+          </div>
+
+          <!-- Live Status Banner -->
+          <div class="status-banner" id="status-banner" aria-hidden="true">Player X's turn</div>
+          <div class="sr-only" id="status-live-region" aria-live="polite">Player X's turn</div>
+
+          <!-- 3x3 Board -->
+          <div class="board-container">
+            <div class="game-board" id="game-board" role="grid" aria-label="Tic Tac Toe 3 by 3 Board">
+              <button class="game-cell" data-index="0" role="gridcell" aria-label="Row 1, Column 1, Empty"></button>
+              <button class="game-cell" data-index="1" role="gridcell" aria-label="Row 1, Column 2, Empty"></button>
+              <button class="game-cell" data-index="2" role="gridcell" aria-label="Row 1, Column 3, Empty"></button>
+              <button class="game-cell" data-index="3" role="gridcell" aria-label="Row 2, Column 1, Empty"></button>
+              <button class="game-cell" data-index="4" role="gridcell" aria-label="Row 2, Column 2, Empty"></button>
+              <button class="game-cell" data-index="5" role="gridcell" aria-label="Row 2, Column 3, Empty"></button>
+              <button class="game-cell" data-index="6" role="gridcell" aria-label="Row 3, Column 1, Empty"></button>
+              <button class="game-cell" data-index="7" role="gridcell" aria-label="Row 3, Column 2, Empty"></button>
+              <button class="game-cell" data-index="8" role="gridcell" aria-label="Row 3, Column 3, Empty"></button>
+            </div>
+          </div>
+
+          <!-- Footer Actions -->
+          <div class="game-actions-footer">
+            <button class="btn btn-primary" id="btn-restart-game">
+              <i class="fas fa-redo-alt" aria-hidden="true"></i> New Round
+            </button>
+          </div>
+
+          <!-- Theme Bar -->
+          <div class="theme-selector-bar">
+            <span>Color Palette:</span>
+            <div class="theme-swatches" role="group" aria-label="Color Palette Selector">
+              <button class="theme-swatch active" data-theme="cyan-gray" title="Cyan & Gray (Default)" aria-label="Theme: Cyan & Gray" style="background: linear-gradient(135deg, #38bdf8, #f43f5e);"></button>
+              <button class="theme-swatch" data-theme="orange-green" title="Orange & Green" aria-label="Theme: Orange & Green" style="background: linear-gradient(135deg, #fb923c, #4ade80);"></button>
+              <button class="theme-swatch" data-theme="purple-gray" title="Purple & Cyan" aria-label="Theme: Purple & Cyan" style="background: linear-gradient(135deg, #c084fc, #38bdf8);"></button>
+              <button class="theme-swatch" data-theme="classic" title="Classic Red & Blue" aria-label="Theme: Classic Red & Blue" style="background: linear-gradient(135deg, #ef4444, #3b82f6);"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Existing Real Features Highlight -->
+    <section class="features-section" id="features" aria-labelledby="features-title">
+      <div class="container">
+        <header class="section-header">
+          <span class="section-tag">Game Capabilities</span>
+          <h2 class="section-title" id="features-title">Built for Seamless Play</h2>
+          <p class="section-desc">
+            Highlights of the features implemented in the XO Game project across web and standalone editions.
+          </p>
+        </header>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-cyan">
+              <i class="fas fa-th" aria-hidden="true"></i>
+            </div>
+            <h3 class="feature-title">Instant 3x3 Grid</h3>
+            <p class="feature-desc">
+              Responsive canvas with immediate win detection across rows, columns, and diagonals, plus draw detection and score tracking.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-rose">
+              <i class="fas fa-palette" aria-hidden="true"></i>
+            </div>
+            <h3 class="feature-title">10 Color Themes</h3>
+            <p class="feature-desc">
+              Customizable aesthetic color themes inspired by the desktop Tkinter palette, allowing players to personalize grid and token hues.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-purple">
+              <i class="fas fa-network-wired" aria-hidden="true"></i>
+            </div>
+            <h3 class="feature-title">LAN & Local Multiplayer</h3>
+            <p class="feature-desc">
+              Socket-based architecture supporting direct client-server connections over local networks, as well as local pass-and-play matches.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-wrapper feature-icon-amber">
+              <i class="fas fa-cloud-download-alt" aria-hidden="true"></i>
+            </div>
+            <h3 class="feature-title">Auto-Update System</h3>
+            <p class="feature-desc">
+              Built-in background update engine with SemVer comparison, release notes inspection, and direct Windows package installation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to Play Instructions -->
+    <section class="instructions-section" id="how-to-play" aria-labelledby="instructions-title">
+      <div class="container">
+        <header class="section-header">
+          <span class="section-tag">Rules & Controls</span>
+          <h2 class="section-title" id="instructions-title">How to Play</h2>
+          <p class="section-desc">
+            Simple rules for players of all ages. Keyboard and touch-friendly.
+          </p>
+        </header>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <h3 class="step-title">Take Turns Marking</h3>
+            <p class="step-desc">
+              Player X always moves first. Click, tap, or use arrow keys with Enter/Space (or keys 1–9) to claim an empty grid cell.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <h3 class="step-title">Form 3 in a Row</h3>
+            <p class="step-desc">
+              Align three of your marks horizontally, vertically, or diagonally before your opponent does to win the round.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <h3 class="step-title">Block & Strategize</h3>
+            <p class="step-desc">
+              Defend your lines by anticipating your opponent’s next move. If all 9 cells are filled without a 3-in-a-row, it’s a draw!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest Stable Release Highlight & Desktop Download -->
+    <section class="latest-release-section" id="latest-release" aria-labelledby="release-box-title">
+      <div class="container">
+        <div class="release-highlight-box">
+          <div class="release-highlight-info">
+            <div class="release-highlight-header">
+              <span class="badge badge-stable"><span class="badge-dot"></span> Latest Stable</span>
+              <h2 class="release-tag-title" id="latest-release-tag">XO Game v3.0.1</h2>
+              <time class="release-date" id="latest-release-date">October 2, 2026</time>
+            </div>
+            <p class="release-summary-text">
+              The official Windows desktop release includes standalone executable packaging, in-game auto-update notifications, socket multiplayer, and full theme customization without needing Python installed.
+            </p>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.25rem;">
+              <span class="asset-pill" id="latest-release-filename">
+                <i class="fas fa-file-archive" aria-hidden="true"></i> XO_Game-v3.0.1-windows-x64.zip
+              </span>
+              <span class="asset-pill" id="latest-release-sha" style="display: none;"></span>
+            </div>
+          </div>
+
+          <div class="release-highlight-actions">
+            <a 
+              href="https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v3.0.1/XO_Game-v3.0.1-windows-x64.zip" 
+              class="btn btn-primary" 
+              id="btn-download-latest"
+              download
+            >
+              <i class="fas fa-download" aria-hidden="true"></i> Download for Windows
+            </a>
+            <a href="versions/#v3.0.1" class="btn btn-secondary" id="latest-release-notes-link">
+              <i class="fas fa-file-alt" aria-hidden="true"></i> View Release Notes
+            </a>
+            <a href="versions/" class="btn btn-outline">
+              <i class="fas fa-history" aria-hidden="true"></i> All Versions
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand-col">
+          <a href="index.html" class="brand">
+            <div class="brand-icon" aria-hidden="true">
+              <span class="brand-x">X</span>
+              <span class="brand-o">O</span>
+            </div>
+            <span class="brand-text">XO Game</span>
+          </a>
+          <p class="footer-desc">
+            An open-source Tic-Tac-Toe project featuring in-browser play, Windows desktop distribution, socket multiplayer, and an automated release pipeline.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="#play-arena" class="footer-link trigger-play-now">Play Online</a></li>
+            <li><a href="#features" class="footer-link">Features</a></li>
+            <li><a href="#how-to-play" class="footer-link">How to Play</a></li>
+            <li><a href="#latest-release" class="footer-link">Download</a></li>
+            <li><a href="versions/" class="footer-link">Version History</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Project & Code</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/Mahfoud-Sa/tik-tak-to" class="footer-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i> GitHub Repository</a></li>
+            <li><a href="https://github.com/Mahfoud-Sa/tik-tak-to/releases" class="footer-link" target="_blank" rel="noopener noreferrer"><i class="fas fa-tags" aria-hidden="true"></i> GitHub Releases</a></li>
+            <li><a href="updates/releases.json" class="footer-link" target="_blank"><i class="fas fa-code" aria-hidden="true"></i> Releases Manifest (JSON)</a></li>
+            <li><a href="updates/version.json" class="footer-link" target="_blank"><i class="fas fa-file-code" aria-hidden="true"></i> Latest Manifest (JSON)</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 XO Game. Developed by Mahfoud Mohamed Binsabbah.</p>
+        <p>Open Source under MIT License.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/game.js"></script>
+  <script src="js/landing.js"></script>
+</body>
 </html>

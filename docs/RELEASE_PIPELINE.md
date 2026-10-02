@@ -44,43 +44,58 @@ The automated workflow manages the entire build, packaging, release creation, an
    * Computes cryptographic `SHA-256` checksums into `checksums.txt`.
 4. **Changelog & Manifest Generation**:
    Generates player-facing release notes from git commits since previous release and creates `version.json` compliant with [schemas/version-manifest.schema.json](file:///c:/Users/mahfoud/Documents/GitHub/XO_Game/schemas/version-manifest.schema.json).
+   Simultaneously updates the cumulative release history in `docs/updates/releases.json` compliant with [schemas/version-history.schema.json](file:///c:/Users/mahfoud/Documents/GitHub/XO_Game/schemas/version-history.schema.json).
 5. **GitHub Release Publishing**:
    Uploads `XO_Game.exe`, `XO_Game-vX.Y.Z-windows-x64.zip`, `checksums.txt`, and `version.json` using GitHub CLI (`gh release create --clobber`).
-6. **Public Metadata Sync**:
-   For stable releases, commits `docs/updates/version.json` back to the repository so GitHub Pages immediately serves the latest update info.
+6. **Public Metadata & Website History Sync**:
+   * For **stable** releases: updates `docs/updates/version.json` (latest stable manifest consumed by desktop updater and website hero) AND `docs/updates/releases.json` (version history feed).
+   * For **prereleases**: updates only `docs/updates/releases.json` with `channel: "prerelease"`, ensuring prereleases never displace the latest stable manifest in `version.json`.
+   * Automatically commits both files back to the repository branch so GitHub Pages immediately serves the updated version history and download links.
 
 ---
 
-## 3. Public Update Manifest Specification
+## 3. Public Update Manifest & Release History Specification
 
+### 3.1 Single Release Manifest (`docs/updates/version.json`)
 * **Schema**: [schemas/version-manifest.schema.json](file:///c:/Users/mahfoud/Documents/GitHub/XO_Game/schemas/version-manifest.schema.json)
-* **Sample Manifest** (`docs/updates/version.json`):
+* Stores metadata for the single latest stable release. Ingested by the in-game auto-updater.
+
+### 3.2 Historical Releases Catalog (`docs/updates/releases.json`)
+* **Schema**: [schemas/version-history.schema.json](file:///c:/Users/mahfoud/Documents/GitHub/XO_Game/schemas/version-history.schema.json)
+* Stores the cumulative release catalog sorted newest first. Shared by the website landing page and the dedicated `/versions` history page.
+* Sample structure:
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/Mahfoud-Sa/tik-tak-to/main/schemas/version-manifest.schema.json",
+  "$schema": "https://raw.githubusercontent.com/Mahfoud-Sa/tik-tak-to/main/schemas/version-history.schema.json",
   "schema_version": 1,
-  "name": "XO Game",
-  "version": "5.0.0",
-  "tag_name": "v5.0.0",
-  "channel": "stable",
-  "published_at": "2026-10-02T10:00:00Z",
-  "mandatory": false,
-  "release_notes": "Initial Release v5.0.0",
-  "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v5.0.0",
-  "platforms": {
-    "windows": {
-      "file_name": "XO_Game-windows-x64.zip",
-      "download_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v5.0.0/XO_Game-windows-x64.zip",
-      "sha256": "..."
+  "latest_stable": "3.0.1",
+  "updated_at": "2026-10-02T08:06:41Z",
+  "releases": [
+    {
+      "name": "XO Game v3.0.1",
+      "version": "3.0.1",
+      "tag_name": "v3.0.1",
+      "channel": "stable",
+      "published_at": "2026-10-02T08:06:41Z",
+      "mandatory": false,
+      "release_notes": "...",
+      "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v3.0.1",
+      "platforms": {
+        "windows": {
+          "file_name": "XO_Game-v3.0.1-windows-x64.zip",
+          "download_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v3.0.1/XO_Game-v3.0.1-windows-x64.zip",
+          "sha256": "f62675d20c6b2873924be98c20d0749d1ac5aac655ebb7a0a15291234efec81a"
+        }
+      }
     }
-  }
+  ]
 }
 ```
 
 ### Manifest Ingestion & Failover Strategy
-The in-game update engine queries sources in priority order:
-1. **GitHub Pages Endpoint**: `https://mahfoud-sa.github.io/tik-tak-to/updates/version.json` (fast static CDN).
-2. **GitHub Raw Repository**: `https://raw.githubusercontent.com/Mahfoud-Sa/tik-tak-to/main/docs/updates/version.json`.
+The in-game update engine and website query sources in priority order:
+1. **GitHub Pages Endpoint**: `https://mahfoud-sa.github.io/tik-tak-to/updates/releases.json` and `version.json` (fast static CDN).
+2. **GitHub Raw Repository**: `https://raw.githubusercontent.com/Mahfoud-Sa/tik-tak-to/main/docs/updates/releases.json`.
 3. **Latest Release Asset**: `https://github.com/Mahfoud-Sa/tik-tak-to/releases/latest/download/version.json`.
 4. **GitHub Releases API Fallback**: `https://api.github.com/repos/Mahfoud-Sa/tik-tak-to/releases/latest`.
 
