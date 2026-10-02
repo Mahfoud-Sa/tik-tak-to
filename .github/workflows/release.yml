@@ -235,16 +235,30 @@ jobs:
           
           ZIP_NAME="XO_Game-${TAG}-windows-x64.zip"
           
-          # Use GitHub CLI to create or update release
-          gh release create "$TAG" \
-            "dist/XO_Game.exe" \
-            "dist/$ZIP_NAME" \
-            "dist/checksums.txt" \
-            "dist/version.json" \
-            --title "XO Game $TAG" \
-            --notes-file "dist/release_notes.md" \
-            $PRERELEASE_FLAG \
-            --clobber
+          # Check if release already exists (supports safe reruns)
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists. Uploading updated assets and updating notes..."
+            gh release upload "$TAG" \
+              "dist/XO_Game.exe" \
+              "dist/$ZIP_NAME" \
+              "dist/checksums.txt" \
+              "dist/version.json" \
+              --clobber
+            gh release edit "$TAG" \
+              --title "XO Game $TAG" \
+              --notes-file "dist/release_notes.md" \
+              $PRERELEASE_FLAG
+          else
+            echo "Creating new release $TAG..."
+            gh release create "$TAG" \
+              "dist/XO_Game.exe" \
+              "dist/$ZIP_NAME" \
+              "dist/checksums.txt" \
+              "dist/version.json" \
+              --title "XO Game $TAG" \
+              --notes-file "dist/release_notes.md" \
+              $PRERELEASE_FLAG
+          fi
 
       - name: Update Static Manifest in Repository (Stable Releases)
         if: steps.meta.outputs.channel == 'stable'
@@ -257,5 +271,5 @@ jobs:
             echo "No changes to docs/updates/version.json"
           else
             git commit -m "chore(release): update public version manifest for ${{ steps.meta.outputs.tag }} [skip ci]"
-            git push origin HEAD:main
+            git push origin HEAD:${{ github.ref_name }}
           fi
