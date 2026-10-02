@@ -90,6 +90,32 @@ class TestI18n(unittest.TestCase):
         new_instance = I18n(settings_file=self.temp_settings.name)
         self.assertEqual(new_instance.get_language(), "en")
 
+    def test_directionality_helpers_ar(self):
+        self.i18n_instance.set_language("ar")
+        self.assertTrue(self.i18n_instance.is_rtl)
+        self.assertEqual(self.i18n_instance.direction, "rtl")
+        self.assertEqual(self.i18n_instance.side_start(), "right")
+        self.assertEqual(self.i18n_instance.side_end(), "left")
+        self.assertEqual(self.i18n_instance.anchor_start(), "e")
+        self.assertEqual(self.i18n_instance.anchor_end(), "w")
+        # Grid column mirroring for 3-column layout
+        self.assertEqual(self.i18n_instance.grid_col(0, 3), 2)
+        self.assertEqual(self.i18n_instance.grid_col(1, 3), 1)
+        self.assertEqual(self.i18n_instance.grid_col(2, 3), 0)
+
+    def test_directionality_helpers_en(self):
+        self.i18n_instance.set_language("en")
+        self.assertFalse(self.i18n_instance.is_rtl)
+        self.assertEqual(self.i18n_instance.direction, "ltr")
+        self.assertEqual(self.i18n_instance.side_start(), "left")
+        self.assertEqual(self.i18n_instance.side_end(), "right")
+        self.assertEqual(self.i18n_instance.anchor_start(), "w")
+        self.assertEqual(self.i18n_instance.anchor_end(), "e")
+        # Grid column mirroring for 3-column layout
+        self.assertEqual(self.i18n_instance.grid_col(0, 3), 0)
+        self.assertEqual(self.i18n_instance.grid_col(1, 3), 1)
+        self.assertEqual(self.i18n_instance.grid_col(2, 3), 2)
+
 
 class TestAppLanguageSwitch(unittest.TestCase):
     """Test suite for TicTacToeApp dynamic language toggle integration."""
@@ -103,7 +129,7 @@ class TestAppLanguageSwitch(unittest.TestCase):
         self, mock_tk, mock_state, mock_ctrl, mock_view, mock_help
     ):
         from main import TicTacToeApp
-        mock_state.return_value.game_active = False
+        mock_state.return_value.is_game_active = False
         app = TicTacToeApp()
 
         # Set initial language to Arabic

@@ -144,7 +144,7 @@ class UpdateNotifierDialog:
             font=('Arial', 10),
             fg="#666666"
         )
-        curr_label.pack(side="right", padx=10)
+        curr_label.pack(side=i18n.side_end(), padx=10)
 
         channel_badge = f" [{self.manifest.channel.upper()}]" if self.manifest.channel != "stable" else ""
         new_ver_text = f"{i18n.t('LATEST_VERSION_LABEL')} v{self.manifest.version}{channel_badge}"
@@ -154,14 +154,14 @@ class UpdateNotifierDialog:
             font=('Arial', 11, 'bold'),
             fg="#2E7D32" if not self.is_mandatory else "#C62828"
         )
-        new_label.pack(side="left", padx=10)
+        new_label.pack(side=i18n.side_start(), padx=10)
 
         # Release notes header
         notes_label = Label(
             content_frame,
             text=i18n.t("RELEASE_NOTES_HEADING"),
             font=('Arial', 9, 'bold'),
-            anchor="w"
+            anchor=i18n.anchor_start()
         )
         notes_label.pack(fill="x", pady=(6, 2))
 
@@ -194,18 +194,7 @@ class UpdateNotifierDialog:
         self.btn_frame = Frame(self.dialog, pady=10, padx=20)
         self.btn_frame.pack(fill="x")
 
-        # Later button (omitted or disabled if mandatory)
-        if not self.is_mandatory:
-            self.later_btn = Button(
-                self.btn_frame,
-                text=i18n.t("LATER_BUTTON_TEXT"),
-                font=BUTTON_FONT,
-                width=10,
-                command=self._on_later
-            )
-            self.later_btn.pack(side="right", padx=8)
-
-        # Download / Update button
+        # Download / Update button (Primary action on side_start)
         self.download_btn = Button(
             self.btn_frame,
             text=f"⬇️ {i18n.t('DOWNLOAD_UPDATE_BUTTON_TEXT')}",
@@ -216,7 +205,18 @@ class UpdateNotifierDialog:
             activeforeground="white",
             command=self._on_download
         )
-        self.download_btn.pack(side="left", padx=8)
+        self.download_btn.pack(side=i18n.side_start(), padx=8)
+
+        # Later button (Dismiss action on side_end)
+        if not self.is_mandatory:
+            self.later_btn = Button(
+                self.btn_frame,
+                text=i18n.t("LATER_BUTTON_TEXT"),
+                font=BUTTON_FONT,
+                width=10,
+                command=self._on_later
+            )
+            self.later_btn.pack(side=i18n.side_end(), padx=8)
 
     def _on_download(self):
         """Handle download action. If running in source mode, redirect to browser."""
@@ -257,14 +257,6 @@ class UpdateNotifierDialog:
         )
         self._progress_label.pack(side="top", fill="x", pady=(0, 4))
 
-        self._progress_bar = ttk.Progressbar(
-            self.btn_frame,
-            orient='horizontal',
-            mode='determinate',
-            length=300
-        )
-        self._progress_bar.pack(side="left", fill="x", expand=True, padx=(0, 10))
-
         self._cancel_btn = Button(
             self.btn_frame,
             text=i18n.t("CANCEL_TEXT"),
@@ -272,7 +264,16 @@ class UpdateNotifierDialog:
             width=8,
             command=self._on_cancel_download
         )
-        self._cancel_btn.pack(side="right")
+        self._cancel_btn.pack(side=i18n.side_end())
+
+        progress_padx = (10, 0) if i18n.is_rtl else (0, 10)
+        self._progress_bar = ttk.Progressbar(
+            self.btn_frame,
+            orient='horizontal',
+            mode='determinate',
+            length=300
+        )
+        self._progress_bar.pack(side=i18n.side_start(), fill="x", expand=True, padx=progress_padx)
 
         self.update_service.download_update_async(
             manifest=self.manifest,

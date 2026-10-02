@@ -327,6 +327,44 @@ class I18n:
         self.set_language(new_lang)
         return new_lang
 
+    @property
+    def is_rtl(self) -> bool:
+        """Return True if the current language is Right-to-Left (e.g., Arabic)."""
+        return self._current_lang == "ar"
+
+    @property
+    def direction(self) -> str:
+        """Return 'rtl' or 'ltr' based on current active language."""
+        return "rtl" if self.is_rtl else "ltr"
+
+    def side_start(self) -> str:
+        """Return 'right' for RTL languages and 'left' for LTR languages (for pack/layout)."""
+        return "right" if self.is_rtl else "left"
+
+    def side_end(self) -> str:
+        """Return 'left' for RTL languages and 'right' for LTR languages (for pack/layout)."""
+        return "left" if self.is_rtl else "right"
+
+    def anchor_start(self) -> str:
+        """Return Tkinter anchor for text start ('e' for RTL, 'w' for LTR)."""
+        return "e" if self.is_rtl else "w"
+
+    def anchor_end(self) -> str:
+        """Return Tkinter anchor for text end ('w' for RTL, 'e' for LTR)."""
+        return "w" if self.is_rtl else "e"
+
+    def grid_col(self, col: int, total_cols: int = 3) -> int:
+        """
+        Map a logical column index (0-based) to its mirrored column in RTL mode.
+        For a 3-column layout:
+        col 0 -> 2 in RTL, 0 in LTR
+        col 1 -> 1 in RTL, 1 in LTR
+        col 2 -> 0 in RTL, 2 in LTR
+        """
+        if self.is_rtl:
+            return (total_cols - 1) - col
+        return col
+
     def t(self, key: str, **kwargs) -> str:
         """
         Translate a key to current language with optional keyword interpolation.

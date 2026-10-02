@@ -202,7 +202,7 @@ class HostGameDialog:
             text=i18n.t("YOUR_IP_TEXT"),
             font=('Arial', 11)
         )
-        ip_label.pack(side='left')
+        ip_label.pack(side=i18n.side_start())
         
         ip_value = Label(
             ip_frame,
@@ -210,7 +210,7 @@ class HostGameDialog:
             font=('Arial', 12, 'bold'),
             fg='blue'
         )
-        ip_value.pack(side='left')
+        ip_value.pack(side=i18n.side_start())
         
         # Port info
         port_label = Label(
@@ -232,7 +232,7 @@ class HostGameDialog:
             height=20,
             highlightthickness=0
         )
-        self._status_canvas.pack(side='left', padx=5)
+        self._status_canvas.pack(side=i18n.side_start(), padx=5)
         self._status_circle = self._status_canvas.create_oval(
             2, 2, 18, 18,
             fill=STATUS_WAITING_COLOR,
@@ -245,7 +245,7 @@ class HostGameDialog:
             text=i18n.t("WAITING_TEXT"),
             font=('Arial', 11)
         )
-        self._status_label.pack(side='left')
+        self._status_label.pack(side=i18n.side_start())
         
         # Button frame
         btn_frame = Frame(self.dialog)
@@ -259,7 +259,7 @@ class HostGameDialog:
             width=10,
             command=self._on_refresh_click
         )
-        self._refresh_btn.pack(side='left', padx=5)
+        self._refresh_btn.pack(side=i18n.side_start(), padx=5)
         
         # Cancel button
         cancel_btn = Button(
@@ -269,7 +269,7 @@ class HostGameDialog:
             width=10,
             command=self._on_cancel_click
         )
-        cancel_btn.pack(side='left', padx=5)
+        cancel_btn.pack(side=i18n.side_start(), padx=5)
     
     def set_connected(self, connected: bool):
         """Update the connection status indicator."""
@@ -388,16 +388,17 @@ class JoinGameDialog:
             text=i18n.t("ENTER_IP_TEXT"),
             font=('Arial', 11)
         )
-        ip_label.pack(side='left', padx=5)
+        ip_label.pack(side=i18n.side_start(), padx=5)
         
         self._ip_var = StringVar()
         self._ip_entry = Entry(
             ip_frame,
             textvariable=self._ip_var,
             font=('Arial', 11),
-            width=15
+            width=15,
+            justify='left'
         )
-        self._ip_entry.pack(side='left', padx=5)
+        self._ip_entry.pack(side=i18n.side_start(), padx=5)
         self._ip_entry.focus_set()
         
         # Port info
@@ -420,7 +421,7 @@ class JoinGameDialog:
             height=20,
             highlightthickness=0
         )
-        self._status_canvas.pack(side='left', padx=5)
+        self._status_canvas.pack(side=i18n.side_start(), padx=5)
         self._status_circle = self._status_canvas.create_oval(
             2, 2, 18, 18,
             fill=STATUS_DISCONNECTED_COLOR,
@@ -433,7 +434,7 @@ class JoinGameDialog:
             text=i18n.t("CONNECTION_FAILED_TEXT"),
             font=('Arial', 11)
         )
-        self._status_label.pack(side='left')
+        self._status_label.pack(side=i18n.side_start())
         
         # Button frame
         btn_frame = Frame(self.dialog)
@@ -447,7 +448,7 @@ class JoinGameDialog:
             width=10,
             command=self._on_connect_click
         )
-        self._connect_btn.pack(side='left', padx=5)
+        self._connect_btn.pack(side=i18n.side_start(), padx=5)
         
         # Refresh button
         self._refresh_btn = Button(
@@ -457,7 +458,7 @@ class JoinGameDialog:
             width=10,
             command=self._on_refresh_click
         )
-        self._refresh_btn.pack(side='left', padx=5)
+        self._refresh_btn.pack(side=i18n.side_start(), padx=5)
         
         # Cancel button
         cancel_btn = Button(
@@ -467,7 +468,7 @@ class JoinGameDialog:
             width=10,
             command=self._on_cancel_click
         )
-        cancel_btn.pack(side='left', padx=5)
+        cancel_btn.pack(side=i18n.side_start(), padx=5)
         
         # Bind Enter key
         self._ip_entry.bind('<Return>', lambda e: self._on_connect_click())

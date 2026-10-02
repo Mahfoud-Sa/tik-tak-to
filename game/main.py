@@ -83,6 +83,7 @@ class TicTacToeApp:
         
         # Create UI
         self._create_ui()
+        i18n.subscribe(self._update_ui_language)
         
         # Update Service & Mandatory Update Gate
         self.update_service = UpdateService(current_version=__version__)
@@ -172,16 +173,21 @@ class TicTacToeApp:
         self._update_ui_language()
 
     def _update_ui_language(self):
-        """Update all dynamic UI text to the current language."""
+        """Update all dynamic UI text and layout direction to the current language."""
         self.root.title(i18n.t("WINDOW_TITLE"))
         self.title_label.config(text=i18n.t("WINDOW_TITLE"))
-        if not self.state.game_active:
+        if not self.state.is_game_active:
             self.play_button.config(text=i18n.t("PLAY_BUTTON_TEXT"))
         else:
             self.play_button.config(text=i18n.t("EXIT_BUTTON_TEXT"))
         self.multiplayer_button.config(text=i18n.t("MULTIPLAYER_BUTTON_TEXT"))
         self.lang_button.config(text=i18n.t("LANG_SWITCH_BUTTON_TEXT"))
         self._setup_help_menu()
+        self.view.update_layout_direction()
+        if self._status_canvas and self._status_canvas.winfo_exists():
+            indicator_col = i18n.grid_col(0, 3)
+            sticky_dir = 'ne' if i18n.is_rtl else 'nw'
+            self._status_canvas.grid_configure(column=indicator_col, sticky=sticky_dir)
     
     def _create_connection_indicator(self):
         """Create the connection status indicator on the game board."""
@@ -198,7 +204,9 @@ class TicTacToeApp:
                 fill=STATUS_CONNECTED_COLOR,
                 outline=''
             )
-            self._status_canvas.grid(column=0, row=2, sticky='nw', padx=5, pady=5)
+            indicator_col = i18n.grid_col(0, 3)
+            sticky_dir = 'ne' if i18n.is_rtl else 'nw'
+            self._status_canvas.grid(column=indicator_col, row=2, sticky=sticky_dir, padx=5, pady=5)
     
     def _update_connection_indicator(self, connected: bool):
         """Update the connection status indicator."""

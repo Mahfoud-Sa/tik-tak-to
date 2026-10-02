@@ -27,6 +27,11 @@ from config import (
     MIN_POSITION, MAX_POSITION, INITIAL_SHAPES_COUNT,
     PLAYER_O, PLAYER_X, SYMBOL_O
 )
+try:
+    from utils.i18n import i18n
+except ImportError:
+    from game.utils.i18n import i18n
+
 
 
 class GameView:
@@ -110,17 +115,32 @@ class GameView:
             command=self._on_starting_player_change
         )
         
-        # Place UI elements
-        self.o_wins_label.grid(column=0, row=1, ipadx=LABEL_PADDING_X, ipady=LABEL_PADDING_Y)
-        self.x_wins_label.grid(column=2, row=1, ipadx=LABEL_PADDING_X, ipady=LABEL_PADDING_Y)
-        self.player_o_radio.grid(column=0, row=2)
-        self.player_x_radio.grid(column=2, row=2)
+        # Place UI elements with directional layout support
+        o_col = i18n.grid_col(0, 3)
+        x_col = i18n.grid_col(2, 3)
+        self.o_wins_label.grid(column=o_col, row=1, ipadx=LABEL_PADDING_X, ipady=LABEL_PADDING_Y)
+        self.x_wins_label.grid(column=x_col, row=1, ipadx=LABEL_PADDING_X, ipady=LABEL_PADDING_Y)
+        self.player_o_radio.grid(column=o_col, row=2)
+        self.player_x_radio.grid(column=x_col, row=2)
         
         # Default selection
         self.player_o_radio.select()
         
         # Bind game canvas click
         self.game_canvas.bind("<Button-1>", self._on_board_click)
+
+    def update_layout_direction(self):
+        """Update widget placement when language / layout direction changes."""
+        o_col = i18n.grid_col(0, 3)
+        x_col = i18n.grid_col(2, 3)
+        if self.o_wins_label and self.o_wins_label.winfo_exists():
+            self.o_wins_label.grid_configure(column=o_col)
+        if self.x_wins_label and self.x_wins_label.winfo_exists():
+            self.x_wins_label.grid_configure(column=x_col)
+        if self.player_o_radio and self.player_o_radio.winfo_exists():
+            self.player_o_radio.grid_configure(column=o_col)
+        if self.player_x_radio and self.player_x_radio.winfo_exists():
+            self.player_x_radio.grid_configure(column=x_col)
     
     def cleanup_game_ui(self):
         """Remove game UI elements (called when exiting game)."""
