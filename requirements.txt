@@ -1,0 +1,5 @@
+# Core project dependencies for XO Game (desktop build & development)
+# Python standard libraries used: tkinter, socket, threading, urllib, json, dataclasses
+
+# Build & packaging dependencies
+pyinstaller>=6.0.0
