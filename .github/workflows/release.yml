@@ -105,6 +105,23 @@ jobs:
           echo "mandatory=${IS_MANDATORY}" >> "$GITHUB_OUTPUT"
           echo "custom_notes=${CUSTOM_NOTES}" >> "$GITHUB_OUTPUT"
 
+      - name: Synchronize Version Files (Manual Dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          echo "Auto-syncing codebase to target version: ${{ steps.meta.outputs.version }}"
+          python scripts/validate_version.py --sync "${{ steps.meta.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add game/config.py game/version.txt
+          if ! git diff --staged --quiet; then
+            echo "Committing version sync..."
+            git commit -m "chore(release): bump version to ${{ steps.meta.outputs.version }} [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "Files already synchronized."
+          fi
+
       - name: Validate Version Agreement
         shell: bash
         run: |
