@@ -2,18 +2,18 @@
   "$schema": "https://raw.githubusercontent.com/Mahfoud-Sa/tik-tak-to/main/schemas/version-manifest.schema.json",
   "schema_version": 1,
   "name": "XO Game",
-  "version": "5.0.0",
-  "tag_name": "v5.0.0",
+  "version": "3.0.1",
+  "tag_name": "v3.0.1",
   "channel": "stable",
-  "published_at": "2026-10-02T07:44:22Z",
+  "published_at": "2026-10-02T08:06:34Z",
   "mandatory": false,
-  "release_notes": "Initial Release",
-  "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v5.0.0",
+  "release_notes": "## XO Game v3.0.1\n\n### Changes\nChanges since **v5.0.0**:\n* 3bbd6bc chore(release): bump version to 3.0.1 [skip ci]\n* 802fffb ci: add GitHub Actions workflow for release and update pipeline\n* cd876bc chore(release): bump version to 5.1.1 [skip ci]\n* 928e3b8 chore(release): bump version to 3.0.1 [skip ci]\n* bc511b2 ci: add release and update pipeline workflow\n* 73fc972 ci: add GitHub Actions workflow for release pipeline and requirements.txt\n* 1b5938f feat: add agent skills and release pipeline with updater features\n* 93dd593 feat: Initialize game project with core files, configuration, and PyInstaller build setup.\n",
+  "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v3.0.1",
   "platforms": {
     "windows": {
-      "file_name": "XO_Game-windows-x64.zip",
-      "download_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v5.0.0/XO_Game-windows-x64.zip",
-      "sha256": ""
+      "file_name": "XO_Game-v3.0.1-windows-x64.zip",
+      "download_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v3.0.1/XO_Game-v3.0.1-windows-x64.zip",
+      "sha256": "f62675d20c6b2873924be98c20d0749d1ac5aac655ebb7a0a15291234efec81a"
     }
   }
 }
