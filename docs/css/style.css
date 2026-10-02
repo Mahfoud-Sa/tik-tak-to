@@ -1878,10 +1878,89 @@ html[dir="rtl"] .icon-flip-rtl {
   animation: skeleton-pulse 1.5s infinite ease-in-out;
 }
 
-@keyframes skeleton-pulse {
-  0% { opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { opacity: 0.5; }
+/* Version History Light Theme Enhancements */
+[data-theme="light"] .page-header {
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.8) 0%, transparent 100%);
+  border-bottom-color: var(--border-subtle);
+}
+
+[data-theme="light"] .filter-tabs {
+  background: #e2e8f0;
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .filter-tab.active {
+  background: #ffffff;
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .release-card {
+  background: #ffffff;
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .release-card:hover {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="light"] .release-card.is-latest-stable {
+  border-color: rgba(5, 150, 105, 0.4);
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.04) 0%, #ffffff 100%);
+}
+
+[data-theme="light"] .release-card-header {
+  border-bottom-color: var(--border-subtle);
+}
+
+[data-theme="light"] .copy-permalink-btn {
+  background: #f1f5f9;
+  border-color: var(--border-medium);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .copy-permalink-btn:hover {
+  background: #ffffff;
+  color: var(--color-x);
+  border-color: var(--border-focus);
+}
+
+[data-theme="light"] .release-assets-bar {
+  background: #f8fafc;
+  border-color: var(--border-subtle);
+}
+
+[data-theme="light"] .asset-pill {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  color: #334155;
+}
+
+[data-theme="light"] .state-box,
+[data-theme="light"] .skeleton-card {
+  background: #ffffff;
+  border-color: var(--border-subtle);
+}
+
+[data-theme="light"] .skeleton-line {
+  background: rgba(15, 23, 42, 0.07);
+}
+
+/* RTL Adjustments for Version History */
+html[dir="rtl"] .category-list {
+  padding-left: 0;
+  padding-right: 1.25rem;
+}
+
+html[dir="rtl"] .category-list li::before {
+  left: auto;
+  right: -1.25rem;
+}
+
+html[dir="rtl"] .versions-filter-tip {
+  margin-inline-start: auto;
 }
 
 /* ==========================================================================

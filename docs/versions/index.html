@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Version History & Release Notes - XO Game</title>
   <meta name="description" content="Changelog, release notes, and download packages for XO Game. View the full version history with added features, improvements, and bug fixes.">
-  <meta name="theme-color" content="#070a11">
+  <meta name="keywords" content="Tic-Tac-Toe, XO Game, Version History, Changelog, Releases, Windows, PyInstaller, Open Source">
+  <meta name="theme-color" content="#070a13">
 
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
   <link rel="apple-touch-icon" href="../img/icon.png">
 
-  <!-- Google Fonts: Outfit (headings) & Inter (body) -->
+  <!-- Google Fonts: Outfit (headings), Inter (body), and Cairo (Arabic) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -22,7 +23,7 @@
   <!-- Shared Stylesheet -->
   <link rel="stylesheet" href="../css/style.css">
 
-  <!-- Inline Script to prevent Theme Flash -->
+  <!-- Inline Script to prevent Theme and Language Flash -->
   <script>
     (function () {
       try {
@@ -41,7 +42,7 @@
 </head>
 <body>
   <!-- Accessibility Skip Link -->
-  <a href="#releases-feed" class="skip-link">Skip to Releases</a>
+  <a href="#releases-feed" class="skip-link" data-i18n="skipLink">Skip to Releases</a>
 
   <!-- Header & Navigation -->
   <header class="site-header">
@@ -50,23 +51,39 @@
         <div class="brand-icon-wrapper" aria-hidden="true">
           <img src="../img/icon.png" alt="XO Game" class="brand-img" width="38" height="38">
         </div>
-        <span class="brand-text">XO Game</span>
+        <span class="brand-text" data-i18n="brandName">XO Game</span>
       </a>
 
       <nav aria-label="Main Navigation">
         <ul class="nav-links" id="nav-links">
-          <li><a href="../index.html" class="nav-link">Home</a></li>
-          <li><a href="../index.html#play-arena" class="nav-link">Play Now</a></li>
-          <li><a href="../index.html#features" class="nav-link">Features</a></li>
-          <li><a href="./" class="nav-link active" aria-current="page">Version History</a></li>
+          <li><a href="../index.html" class="nav-link" data-i18n="versionsBreadcrumbHome">Home</a></li>
+          <li><a href="../index.html#play-arena" class="nav-link" data-i18n="navPlay">Play Now</a></li>
+          <li><a href="../index.html#features" class="nav-link" data-i18n="navFeatures">Features</a></li>
+          <li><a href="../index.html#open-source" class="nav-link" data-i18n="navOpenSource">Open Source</a></li>
+          <li><a href="./" class="nav-link active" aria-current="page" data-i18n="navVersions">Version History</a></li>
         </ul>
       </nav>
 
       <div class="nav-actions">
+        <!-- Theme Switcher Button -->
+        <button class="action-btn theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Switch to Light Mode" title="Switch to Light Mode">
+          <i class="fas fa-sun" aria-hidden="true"></i>
+        </button>
+
+        <!-- Language Switcher Button -->
+        <button class="action-btn lang-toggle-btn" id="lang-toggle-btn" type="button" aria-label="Switch language to Arabic" title="Switch language to Arabic">
+          <i class="fas fa-globe" aria-hidden="true"></i>
+          <span class="lang-text" data-i18n="langToggleText">العربية</span>
+        </button>
+
+        <!-- Play Online Button -->
         <a href="../index.html#play-arena" class="btn btn-primary btn-sm">
-          <i class="fas fa-play" aria-hidden="true"></i> Play Online
+          <i class="fas fa-play" aria-hidden="true"></i>
+          <span data-i18n="navPlay">Play Now</span>
         </a>
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false" type="button">
           <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
       </div>
@@ -78,13 +95,13 @@
     <section class="page-header" aria-labelledby="versions-title">
       <div class="container">
         <nav class="breadcrumb" aria-label="Breadcrumb">
-          <a href="../index.html"><i class="fas fa-home" aria-hidden="true"></i> Home</a>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">Version History</span>
+          <a href="../index.html"><i class="fas fa-home" aria-hidden="true"></i> <span data-i18n="versionsBreadcrumbHome">Home</span></a>
+          <span aria-hidden="true" class="breadcrumb-separator">/</span>
+          <span aria-current="page" data-i18n="versionsBreadcrumbCurrent">Version History</span>
         </nav>
 
-        <h1 class="page-title" id="versions-title">Version History & Releases</h1>
-        <p class="page-description">
+        <h1 class="page-title" id="versions-title" data-i18n="versionsTitle">Version History & Releases</h1>
+        <p class="page-description" data-i18n="versionsDesc">
           Explore all stable and prerelease updates for XO Game. Each release includes publication dates, categorized changes, standalone Windows downloads, and cryptographic checksums.
         </p>
       </div>
@@ -94,20 +111,20 @@
     <section class="container" style="padding-top: 1rem; padding-bottom: 4rem;">
       <div class="versions-filter-bar">
         <div class="filter-tabs" role="tablist" aria-label="Release Channel Filters">
-          <button class="filter-tab active" data-filter="all" role="tab" aria-selected="true">
+          <button class="filter-tab active" data-filter="all" role="tab" aria-selected="true" data-i18n="filterAll">
             All Releases
           </button>
-          <button class="filter-tab" data-filter="stable" role="tab" aria-selected="false">
+          <button class="filter-tab" data-filter="stable" role="tab" aria-selected="false" data-i18n="filterStable">
             Stable Only
           </button>
-          <button class="filter-tab" data-filter="prerelease" role="tab" aria-selected="false">
+          <button class="filter-tab" data-filter="prerelease" role="tab" aria-selected="false" data-i18n="filterPrerelease">
             Prereleases
           </button>
         </div>
 
-        <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+        <div class="versions-filter-tip">
           <i class="fas fa-info-circle" aria-hidden="true"></i>
-          <span>Click <strong>Link</strong> on any version card to copy its permalink.</span>
+          <span data-i18n="filterTipText">Click Link on any version card to copy its permalink.</span>
         </div>
       </div>
 
@@ -127,61 +144,47 @@
       <div class="footer-grid">
         <div class="footer-brand-col">
           <a href="../index.html" class="brand">
-            <div class="brand-icon" aria-hidden="true">
-              <span class="brand-x">X</span>
-              <span class="brand-o">O</span>
+            <div class="brand-icon-wrapper" aria-hidden="true">
+              <img src="../img/icon.png" alt="XO Game" width="34" height="34" class="brand-img">
             </div>
-            <span class="brand-text">XO Game</span>
+            <span class="brand-text" data-i18n="brandName">XO Game</span>
           </a>
-          <p class="footer-desc">
+          <p class="footer-desc" data-i18n="footerDesc">
             An open-source Tic-Tac-Toe project featuring in-browser play, Windows desktop distribution, socket multiplayer, and an automated release pipeline.
           </p>
         </div>
 
         <div>
-          <h4 class="footer-heading">Navigation</h4>
+          <h4 class="footer-heading" data-i18n="footerNavHeading">Navigation</h4>
           <ul class="footer-links">
-            <li><a href="../index.html" class="footer-link">Home</a></li>
-            <li><a href="../index.html#play-arena" class="footer-link">Play Online</a></li>
-            <li><a href="../index.html#features" class="footer-link">Features</a></li>
-            <li><a href="./" class="footer-link">Version History</a></li>
+            <li><a href="../index.html" class="footer-link" data-i18n="versionsBreadcrumbHome">Home</a></li>
+            <li><a href="../index.html#play-arena" class="footer-link" data-i18n="footerPlayOnline">Play Online</a></li>
+            <li><a href="../index.html#features" class="footer-link" data-i18n="navFeatures">Features</a></li>
+            <li><a href="../index.html#open-source" class="footer-link" data-i18n="navOpenSource">Open Source</a></li>
+            <li><a href="./" class="footer-link" data-i18n="navVersions">Version History</a></li>
           </ul>
         </div>
 
         <div>
-          <h4 class="footer-heading">Release Feeds</h4>
+          <h4 class="footer-heading" data-i18n="footerFeedsHeading">Release Feeds</h4>
           <ul class="footer-links">
-            <li><a href="../updates/releases.json" class="footer-link" target="_blank"><i class="fas fa-code" aria-hidden="true"></i> releases.json (Full Catalog)</a></li>
-            <li><a href="../updates/version.json" class="footer-link" target="_blank"><i class="fas fa-file-code" aria-hidden="true"></i> version.json (Latest Stable)</a></li>
-            <li><a href="https://github.com/Mahfoud-Sa/tik-tak-to/releases" class="footer-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i> GitHub Releases</a></li>
+            <li><a href="../updates/releases.json" class="footer-link" target="_blank"><i class="fas fa-code" aria-hidden="true"></i> <span data-i18n="footerReleasesFull">releases.json (Full Catalog)</span></a></li>
+            <li><a href="../updates/version.json" class="footer-link" target="_blank"><i class="fas fa-file-code" aria-hidden="true"></i> <span data-i18n="footerReleasesLatest">version.json (Latest Stable)</span></a></li>
+            <li><a href="https://github.com/Mahfoud-Sa/tik-tak-to/releases" class="footer-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i> <span data-i18n="footerGitHubReleases">GitHub Releases</span></a></li>
+            <li><a href="../LICENSE.txt" class="footer-link" target="_blank"><i class="fas fa-balance-scale" aria-hidden="true"></i> <span data-i18n="footerLicense">MIT License</span></a></li>
           </ul>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2026 XO Game. Developed by Mahfoud Mohamed Binsabbah.</p>
-        <p>Open Source under MIT License.</p>
+        <p data-i18n="footerCopyright">&copy; 2026 XO Game. Developed by Mahfoud Mohamed Binsabbah.</p>
+        <p data-i18n="footerOpenSourceNote">Open Source under MIT License.</p>
       </div>
     </div>
   </footer>
 
-  <!-- Mobile menu helper script -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var btn = document.getElementById('mobile-menu-btn');
-      var menu = document.getElementById('nav-links');
-      if (btn && menu) {
-        btn.addEventListener('click', function() {
-          var isOpen = menu.classList.toggle('is-open');
-          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-          btn.innerHTML = isOpen
-            ? '<i class="fas fa-times" aria-hidden="true"></i>'
-            : '<i class="fas fa-bars" aria-hidden="true"></i>';
-        });
-      }
-    });
-  </script>
-  <!-- Release History Engine -->
+  <!-- Scripts in Proper Order -->
+  <script src="../js/i18n.js"></script>
   <script src="../js/versions.js"></script>
 </body>
 </html>
