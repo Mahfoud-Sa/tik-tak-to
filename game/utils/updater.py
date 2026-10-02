@@ -9,6 +9,11 @@ import os
 import re
 import sys
 import time
+import hashlib
+import tempfile
+import zipfile
+import subprocess
+import webbrowser
 import urllib.request
 import urllib.error
 import threading
@@ -282,6 +287,39 @@ class UpdaterSettings:
         return (now - self.get_last_check_time()) >= cooldown_seconds
 
 
+class DownloadCancellationToken:
+    """Thread-safe cancellation token for async download operations."""
+
+    def __init__(self):
+        self._is_cancelled = False
+        self._lock = threading.Lock()
+
+    def cancel(self):
+        with self._lock:
+            self._is_cancelled = True
+
+    @property
+    def is_cancelled(self) -> bool:
+        with self._lock:
+            return self._is_cancelled
+
+
+def verify_file_sha256(filepath: str, expected_sha256: str) -> bool:
+    """
+    Verify file against expected sha256 hex string (case-insensitive).
+    If expected_sha256 is empty or None, verification is skipped and returns True.
+    """
+    if not expected_sha256:
+        return True
+    if not os.path.exists(filepath):
+        return False
+    sha256 = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        while chunk := f.read(65536):
+            sha256.update(chunk)
+    return sha256.hexdigest().lower() == expected_sha256.strip().lower()
+
+
 # Backward compatibility alias
 UpdateInfo = UpdateManifest
 
@@ -492,6 +530,232 @@ class UpdateService:
     def dismiss_update(self, version: str):
         """Persist dismissal of an optional update."""
         self.settings.dismiss_version(version)
+
+    def download_update(
+        self,
+        manifest: UpdateManifest,
+        destination_path: Optional[str] = None,
+        on_progress: Optional[Callable[[int, int, float], None]] = None,
+        cancel_token: Optional[DownloadCancellationToken] = None,
+        chunk_size: int = 65536,
+        timeout: int = 15
+    ) -> Tuple[bool, Optional[str], Optional[str]]:
+        """
+        Download release archive in chunks, tracking progress and verifying SHA-256.
+        Returns: (success, file_path, error_message)
+        """
+        download_url = manifest.download_url or manifest.release_page_url
+        if not download_url:
+            return False, None, "No download URL available in manifest."
+
+        if destination_path is None:
+            temp_dir = tempfile.gettempdir()
+            filename = manifest.file_name or f"XO_Game-{manifest.tag_name}.zip"
+            destination_path = os.path.join(temp_dir, filename)
+
+        headers = {
+            "User-Agent": "XO-Game-UpdateChecker/5.0",
+            "Accept": "*/*"
+        }
+        req = urllib.request.Request(download_url, headers=headers)
+
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                total_bytes = 0
+                content_length = resp.headers.get("Content-Length")
+                if content_length and content_length.isdigit():
+                    total_bytes = int(content_length)
+
+                bytes_received = 0
+                with open(destination_path, "wb") as out_file:
+                    while True:
+                        if cancel_token and cancel_token.is_cancelled:
+                            out_file.close()
+                            if os.path.exists(destination_path):
+                                try:
+                                    os.remove(destination_path)
+                                except Exception:
+                                    pass
+                            return False, None, "Download cancelled by user."
+
+                        chunk = resp.read(chunk_size)
+                        if not chunk:
+                            break
+
+                        out_file.write(chunk)
+                        bytes_received += len(chunk)
+
+                        pct = (bytes_received / total_bytes * 100.0) if total_bytes > 0 else 0.0
+                        if on_progress:
+                            on_progress(bytes_received, total_bytes, pct)
+
+            # Verify integrity
+            if manifest.sha256:
+                if not verify_file_sha256(destination_path, manifest.sha256):
+                    if os.path.exists(destination_path):
+                        try:
+                            os.remove(destination_path)
+                        except Exception:
+                            pass
+                    return False, None, "Checksum verification failed: file does not match expected SHA-256."
+
+            return True, destination_path, None
+
+        except urllib.error.URLError as e:
+            if destination_path and os.path.exists(destination_path):
+                try:
+                    os.remove(destination_path)
+                except Exception:
+                    pass
+            return False, None, f"Network error during download: {e.reason if hasattr(e, 'reason') else e}"
+        except Exception as e:
+            if destination_path and os.path.exists(destination_path):
+                try:
+                    os.remove(destination_path)
+                except Exception:
+                    pass
+            return False, None, f"Download error: {str(e)}"
+
+    def download_update_async(
+        self,
+        manifest: UpdateManifest,
+        on_progress: Optional[Callable[[int, int, float], None]] = None,
+        on_complete: Optional[Callable[[bool, Optional[str], Optional[str]], None]] = None,
+        cancel_token: Optional[DownloadCancellationToken] = None
+    ) -> threading.Thread:
+        """Execute download in a background daemon thread."""
+        def worker():
+            success, filepath, error = self.download_update(
+                manifest=manifest,
+                on_progress=on_progress,
+                cancel_token=cancel_token
+            )
+            if on_complete:
+                on_complete(success, filepath, error)
+
+        thread = threading.Thread(target=worker, daemon=True)
+        thread.start()
+        return thread
+
+
+# =============================================================================
+# IN-PLACE PATCHER & EXEC REPLACEMENT
+# =============================================================================
+
+def stage_executable_from_zip(zip_path: str, destination_dir: Optional[str] = None) -> str:
+    """
+    Extract XO_Game.exe from zip into a staging directory.
+    Returns absolute path to staged executable.
+    """
+    if not os.path.exists(zip_path):
+        raise FileNotFoundError(f"Update archive not found: {zip_path}")
+
+    if destination_dir is None:
+        stage_dir = tempfile.mkdtemp(prefix="xo_update_stage_")
+    else:
+        stage_dir = destination_dir
+        os.makedirs(stage_dir, exist_ok=True)
+
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        exe_member = None
+        for name in zf.namelist():
+            if os.path.basename(name).lower() == "xo_game.exe":
+                exe_member = name
+                break
+
+        if not exe_member:
+            raise FileNotFoundError("XO_Game.exe was not found inside the update package.")
+
+        extracted_path = zf.extract(exe_member, stage_dir)
+        return os.path.abspath(extracted_path)
+
+
+def generate_updater_batch_script(pid: int, staged_exe: str, target_exe: str) -> str:
+    """
+    Generate a Windows batch updater script that waits for process PID to exit,
+    replaces the target executable with the staged binary, relaunches the game,
+    and cleans up artifacts.
+    """
+    staged_dir = os.path.dirname(staged_exe)
+    batch_content = f"""@echo off
+setlocal enabledelayedexpansion
+chcp 65001 >nul
+
+:: Wait for application process {pid} to terminate
+:wait_loop
+tasklist /fi "PID eq {pid}" 2>nul | find "{pid}" >nul
+if !ERRORLEVEL! equ 0 (
+    timeout /t 1 /nobreak >nul
+    goto wait_loop
+)
+
+:: Brief pause to ensure OS releases file locks
+timeout /t 1 /nobreak >nul
+
+:: Replace the target executable with the staged version
+copy /y "{staged_exe}" "{target_exe}" >nul
+if !ERRORLEVEL! neq 0 (
+    move /y "{staged_exe}" "{target_exe}" >nul
+)
+
+:: Clean up staging directory
+rmdir /s /q "{staged_dir}" 2>nul
+
+:: Relaunch the updated application
+start "" "{target_exe}"
+
+:: Self-destruct batch script
+del "%~f0" & exit
+"""
+    return batch_content
+
+
+def apply_in_place_update(zip_path: str, root_window=None) -> bool:
+    """
+    Safely apply an update using the external batch patcher.
+    In dev mode (not sys.frozen), opens browser download page as a fallback.
+    """
+    if not getattr(sys, 'frozen', False):
+        webbrowser.open("https://github.com/Mahfoud-Sa/tik-tak-to/releases")
+        return False
+
+    try:
+        target_exe = os.path.abspath(sys.executable)
+        staged_exe = stage_executable_from_zip(zip_path)
+        pid = os.getpid()
+
+        script_content = generate_updater_batch_script(
+            pid=pid,
+            staged_exe=staged_exe,
+            target_exe=target_exe
+        )
+
+        temp_dir = tempfile.gettempdir()
+        batch_path = os.path.join(temp_dir, f"xo_updater_{pid}.bat")
+        with open(batch_path, "w", encoding="utf-8") as f:
+            f.write(script_content)
+
+        creation_flags = 0
+        if sys.platform == "win32":
+            creation_flags = subprocess.CREATE_NEW_CONSOLE
+
+        subprocess.Popen(
+            ["cmd.exe", "/c", batch_path],
+            creationflags=creation_flags,
+            close_fds=True
+        )
+
+        if root_window:
+            try:
+                root_window.destroy()
+            except Exception:
+                pass
+
+        sys.exit(0)
+        return True
+
+    except Exception:
+        return False
 
 
 # Legacy bridge

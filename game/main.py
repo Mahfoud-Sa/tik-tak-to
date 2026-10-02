@@ -44,7 +44,7 @@ from views.widgets.multiplayer_dialogs import (
 )
 from network.server import GameServer
 from network.client import GameClient
-from utils.updater import UpdateService, UpdateManifest
+from utils.updater import UpdateService, UpdateManifest, apply_in_place_update
 
 
 class TicTacToeApp:
@@ -83,8 +83,9 @@ class TicTacToeApp:
         # Create UI
         self._create_ui()
         
-        # Update Service
+        # Update Service & Mandatory Update Gate
         self.update_service = UpdateService(current_version=__version__)
+        self.pending_mandatory_manifest: Optional[UpdateManifest] = None
         
         # Connection status indicator (hidden initially)
         self._status_canvas = None
@@ -92,9 +93,6 @@ class TicTacToeApp:
         
         # Check for updates in background shortly after startup
         self.root.after(2000, self._check_updates_silent)
-        
-        # Bind window focus event for foreground lifecycle checks (with cooldown)
-        self.root.bind("<FocusIn>", self._on_window_focus_in)
     
     def _set_icon(self):
         """Set the window icon."""
@@ -219,6 +217,10 @@ class TicTacToeApp:
     
     def _show_multiplayer_dialog(self):
         """Show the multiplayer mode selection dialog."""
+        if self.pending_mandatory_manifest is not None:
+            self._show_mandatory_update_lockout_prompt(self.pending_mandatory_manifest)
+            return
+
         MultiplayerModeDialog(
             self.root,
             on_host=self._start_hosting,
@@ -446,12 +448,6 @@ class TicTacToeApp:
         if msg.askyesno(FEEDBACK_TITLE, FEEDBACK_MESSAGE):
             webbrowser.open(GITHUB_URL)
     
-    def _on_window_focus_in(self, event=None):
-        """Lifecycle hook when window returns to foreground. Checks with cooldown."""
-        if event and event.widget != self.root:
-            return
-        self.update_service.check_on_foreground(on_result=self._on_update_result_silent)
-    
     def _check_updates_silent(self):
         """Silently check for updates on startup without blocking gameplay."""
         self.update_service.check_async(is_manual=False, on_result=self._on_update_result_silent)
@@ -465,7 +461,11 @@ class TicTacToeApp:
     ):
         """Handle silent background update check result."""
         if has_update and manifest:
+            if is_mandatory:
+                self.pending_mandatory_manifest = manifest
             self.root.after(0, lambda: self._show_update_dialog(manifest, is_mandatory))
+        elif not has_update:
+            self.pending_mandatory_manifest = None
     
     def _check_updates_manual(self):
         """Manually check for updates when invoked from Help menu."""
@@ -476,14 +476,28 @@ class TicTacToeApp:
             error: Optional[str]
         ):
             if has_update and manifest:
+                if is_mandatory:
+                    self.pending_mandatory_manifest = manifest
                 self.root.after(0, lambda: self._show_update_dialog(manifest, is_mandatory))
             elif error:
                 self.root.after(0, lambda: msg.showwarning(UPDATE_CHECK_ERROR_TITLE, UPDATE_CHECK_ERROR_MESSAGE))
             else:
+                self.pending_mandatory_manifest = None
                 self.root.after(0, lambda: msg.showinfo(UP_TO_DATE_TITLE, UP_TO_DATE_MESSAGE))
         
         self.update_service.check_async(is_manual=True, on_result=on_result)
     
+    def _show_mandatory_update_lockout_prompt(self, manifest: UpdateManifest):
+        """Prompt the player that multiplayer is locked until mandatory update is applied."""
+        title = "تحديث إلزامي مطلوب"
+        message = (
+            f"يتطلب اللعب عبر الشبكة تحديث اللعبة إلى الإصدار v{manifest.version} "
+            "للتوافق مع خوادم اللعب الجماعي.\n\n"
+            "هل ترغب في فتح نافذة التحديث الآن؟"
+        )
+        if msg.askyesno(title, message, icon="warning"):
+            self._show_update_dialog(manifest, is_mandatory=True)
+
     def _show_update_dialog(self, manifest: UpdateManifest, is_mandatory: bool = False):
         """Display the update notification dialog."""
         UpdateNotifierDialog(
@@ -491,8 +505,14 @@ class TicTacToeApp:
             current_version=__version__,
             manifest=manifest,
             is_mandatory=is_mandatory,
-            on_dismiss=self.update_service.dismiss_update
+            on_dismiss=self.update_service.dismiss_update,
+            update_service=self.update_service,
+            on_apply_update=self._apply_downloaded_update
         )
+
+    def _apply_downloaded_update(self, zip_path: str):
+        """Apply downloaded update archive using external patcher."""
+        apply_in_place_update(zip_path=zip_path, root_window=self.root)
     
     def run(self):
         """Run the application main loop."""

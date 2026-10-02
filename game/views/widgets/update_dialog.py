@@ -4,12 +4,13 @@ Displays a modal notification when a new version of the game is available.
 Supports mandatory updates, channel tags, release notes preview, and dismissal persistence.
 """
 
+import sys
 import webbrowser
-from tkinter import Toplevel, Label, Button, Frame, Text, Scrollbar, PhotoImage
+from tkinter import Toplevel, Label, Button, Frame, Text, Scrollbar, PhotoImage, ttk, messagebox as msg
 from os import path
 from typing import Optional, Callable
 
-from utils.updater import UpdateManifest
+from utils.updater import UpdateManifest, UpdateService, DownloadCancellationToken
 from config import (
     ICON_PATH, BUTTON_FONT, TITLE_FONT,
     UPDATE_AVAILABLE_TITLE, UPDATE_DIALOG_HEADING,
@@ -27,13 +28,25 @@ class UpdateNotifierDialog:
         current_version: str,
         manifest: UpdateManifest,
         is_mandatory: bool = False,
-        on_dismiss: Optional[Callable[[str], None]] = None
+        on_dismiss: Optional[Callable[[str], None]] = None,
+        update_service: Optional[UpdateService] = None,
+        on_apply_update: Optional[Callable[[str], None]] = None
     ):
         self.parent = parent
         self.current_version = current_version
         self.manifest = manifest
         self.is_mandatory = is_mandatory
         self.on_dismiss = on_dismiss
+        self.update_service = update_service
+        self.on_apply_update = on_apply_update
+
+        self._is_downloading = False
+        self._cancel_token: Optional[DownloadCancellationToken] = None
+        self._progress_bar = None
+        self._progress_label = None
+        self._cancel_btn = None
+        self.download_btn = None
+        self.later_btn = None
 
         self.dialog = Toplevel(parent)
         self.dialog.title("⚠️ تحديث إجباري" if is_mandatory else UPDATE_AVAILABLE_TITLE)
@@ -65,18 +78,21 @@ class UpdateNotifierDialog:
 
     def _center_window(self, parent):
         """Center the dialog over parent window."""
-        self.dialog.update_idletasks()
-        parent.update_idletasks()
+        try:
+            self.dialog.update_idletasks()
+            parent.update_idletasks()
 
-        px = parent.winfo_x()
-        py = parent.winfo_y()
-        pw = parent.winfo_width()
-        ph = parent.winfo_height()
+            px = int(parent.winfo_x())
+            py = int(parent.winfo_y())
+            pw = int(parent.winfo_width())
+            ph = int(parent.winfo_height())
 
-        x = px + max(0, (pw - self.width) // 2)
-        y = py + max(0, (ph - self.height) // 2)
+            x = px + max(0, (pw - self.width) // 2)
+            y = py + max(0, (ph - self.height) // 2)
 
-        self.dialog.geometry(f"{self.width}x{self.height}+{x}+{y}")
+            self.dialog.geometry(f"{self.width}x{self.height}+{x}+{y}")
+        except Exception:
+            pass
 
     def _create_ui(self):
         """Build dialog widgets."""
@@ -169,23 +185,23 @@ class UpdateNotifierDialog:
         notes_text.config(state="disabled")
 
         # Bottom actions frame
-        btn_frame = Frame(self.dialog, pady=10, padx=20)
-        btn_frame.pack(fill="x")
+        self.btn_frame = Frame(self.dialog, pady=10, padx=20)
+        self.btn_frame.pack(fill="x")
 
         # Later button (omitted or disabled if mandatory)
         if not self.is_mandatory:
-            later_btn = Button(
-                btn_frame,
+            self.later_btn = Button(
+                self.btn_frame,
                 text=LATER_BUTTON_TEXT,
                 font=BUTTON_FONT,
                 width=10,
                 command=self._on_later
             )
-            later_btn.pack(side="right", padx=8)
+            self.later_btn.pack(side="right", padx=8)
 
         # Download / Update button
-        download_btn = Button(
-            btn_frame,
+        self.download_btn = Button(
+            self.btn_frame,
             text=f"⬇️ {DOWNLOAD_UPDATE_BUTTON_TEXT}",
             font=BUTTON_FONT,
             bg="#2E7D32" if not self.is_mandatory else "#C62828",
@@ -194,22 +210,163 @@ class UpdateNotifierDialog:
             activeforeground="white",
             command=self._on_download
         )
-        download_btn.pack(side="left", padx=8)
+        self.download_btn.pack(side="left", padx=8)
 
     def _on_download(self):
-        """Open download or release page link."""
-        target_url = self.manifest.download_url or self.manifest.release_page_url
-        if not target_url:
-            target_url = "https://github.com/Mahfoud-Sa/tik-tak-to/releases"
-        webbrowser.open(target_url)
-        self.dialog.destroy()
+        """Handle download action. If running in source mode, redirect to browser."""
+        if not getattr(sys, 'frozen', False):
+            msg.showinfo(
+                "وضع التطوير / Development Mode",
+                "أنت تعمل حالياً من الكود المصدري (Development Mode).\n\n"
+                "سيتم فتح صفحة الإصدار في المتصفح لتحميل الحزمة يدوياً دون المساس ببيئة بايثون."
+            )
+            target_url = self.manifest.release_page_url or self.manifest.download_url or "https://github.com/Mahfoud-Sa/tik-tak-to/releases"
+            webbrowser.open(target_url)
+            self.dialog.destroy()
+            return
+
+        if self.update_service:
+            self._start_in_modal_download()
+        else:
+            target_url = self.manifest.download_url or self.manifest.release_page_url or "https://github.com/Mahfoud-Sa/tik-tak-to/releases"
+            webbrowser.open(target_url)
+            self.dialog.destroy()
+
+    def _start_in_modal_download(self):
+        """Transform action bar into an in-modal progress bar."""
+        self._is_downloading = True
+        self._cancel_token = DownloadCancellationToken()
+
+        # Hide original buttons
+        if self.download_btn and self.download_btn.winfo_exists():
+            self.download_btn.pack_forget()
+        if self.later_btn and self.later_btn.winfo_exists():
+            self.later_btn.pack_forget()
+
+        # Create progress UI
+        self._progress_label = Label(
+            self.btn_frame,
+            text="جاري بدء التحميل...",
+            font=('Arial', 9),
+            fg="#444444"
+        )
+        self._progress_label.pack(side="top", fill="x", pady=(0, 4))
+
+        self._progress_bar = ttk.Progressbar(
+            self.btn_frame,
+            orient='horizontal',
+            mode='determinate',
+            length=300
+        )
+        self._progress_bar.pack(side="left", fill="x", expand=True, padx=(0, 10))
+
+        self._cancel_btn = Button(
+            self.btn_frame,
+            text="إلغاء",
+            font=BUTTON_FONT,
+            width=8,
+            command=self._on_cancel_download
+        )
+        self._cancel_btn.pack(side="right")
+
+        self.update_service.download_update_async(
+            manifest=self.manifest,
+            on_progress=self._on_download_progress,
+            on_complete=self._on_download_complete,
+            cancel_token=self._cancel_token
+        )
+
+    def _on_download_progress(self, received: int, total: int, pct: float):
+        """Update progress bar and label safely on main UI thread."""
+        try:
+            if not self._is_downloading or not self.dialog.winfo_exists():
+                return
+
+            def update():
+                if not self._is_downloading or not self._progress_bar or not self._progress_label:
+                    return
+                rec_mb = received / (1024 * 1024)
+                tot_mb = total / (1024 * 1024) if total > 0 else 0
+                self._progress_bar['value'] = pct
+                self._progress_label.config(
+                    text=f"جاري التحميل... {rec_mb:.1f} MB / {tot_mb:.1f} MB ({pct:.0f}%)"
+                )
+
+            self.dialog.after(0, update)
+        except Exception:
+            pass
+
+    def _on_cancel_download(self):
+        """Cancel the active download operation."""
+        if self._cancel_token:
+            self._cancel_token.cancel()
+        self._restore_action_buttons()
+
+    def _restore_action_buttons(self):
+        """Tear down progress UI and restore download / later buttons."""
+        self._is_downloading = False
+        if self._progress_bar:
+            self._progress_bar.destroy()
+            self._progress_bar = None
+        if self._progress_label:
+            self._progress_label.destroy()
+            self._progress_label = None
+        if self._cancel_btn:
+            self._cancel_btn.destroy()
+            self._cancel_btn = None
+
+        if self.download_btn and self.download_btn.winfo_exists():
+            self.download_btn.pack(side="left", padx=8)
+        if self.later_btn and self.later_btn.winfo_exists() and not self.is_mandatory:
+            self.later_btn.pack(side="right", padx=8)
+
+    def _on_download_complete(self, success: bool, filepath: Optional[str], error: Optional[str]):
+        """Handle download finish or error."""
+        try:
+            if not self.dialog.winfo_exists():
+                return
+
+            def handle():
+                if not self._is_downloading:
+                    return
+
+                if success and filepath:
+                    self.dialog.destroy()
+                    if self.on_apply_update:
+                        self.on_apply_update(filepath)
+                    else:
+                        msg.showinfo("اكتمل التحميل", f"تم تحميل التحديث بنجاح إلى:\n{filepath}")
+                else:
+                    if self._cancel_token and self._cancel_token.is_cancelled:
+                        self._restore_action_buttons()
+                        return
+
+                    target_url = self.manifest.release_page_url or self.manifest.download_url or "https://github.com/Mahfoud-Sa/tik-tak-to/releases"
+                    err_msg = error or "حدث خطأ غير متوقع أثناء التحميل."
+                    prompt = (
+                        f"فشل تحميل التحديث:\n{err_msg}\n\n"
+                        "هل ترغب في فتح صفحة الإصدار في المتصفح للتحميل يدوياً؟"
+                    )
+                    if msg.askyesno("فشل التحميل", prompt, icon="error"):
+                        webbrowser.open(target_url)
+                        self.dialog.destroy()
+                    else:
+                        self._restore_action_buttons()
+
+            self.dialog.after(0, handle)
+        except Exception:
+            pass
 
     def _on_later(self):
         """Player clicked Later; persist dismissal so it doesn't prompt again automatically."""
+        if self._is_downloading and self._cancel_token:
+            self._cancel_token.cancel()
         if self.on_dismiss:
             self.on_dismiss(self.manifest.version)
         self.dialog.destroy()
 
     def _on_mandatory_close(self):
         """Closing a mandatory update dialog closes the dialog."""
+        if self._is_downloading and self._cancel_token:
+            self._cancel_token.cancel()
         self.dialog.destroy()
