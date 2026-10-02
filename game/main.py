@@ -45,6 +45,7 @@ from views.widgets.multiplayer_dialogs import (
 from network.server import GameServer
 from network.client import GameClient
 from utils.updater import UpdateService, UpdateManifest, apply_in_place_update
+from utils.i18n import i18n
 
 
 class TicTacToeApp:
@@ -54,7 +55,7 @@ class TicTacToeApp:
         """Initialize the application."""
         # Create root window
         self.root = Tk()
-        self.root.title(WINDOW_TITLE)
+        self.root.title(i18n.t("WINDOW_TITLE"))
         self.root.resizable(False, False)
         self._set_icon()
         
@@ -107,20 +108,20 @@ class TicTacToeApp:
         # Title label
         self.title_label = create_title_label(
             self.root,
-            WINDOW_TITLE,
+            i18n.t("WINDOW_TITLE"),
             TITLE_FONT,
             'groove',
             grid_options={"column": 1, "row": 0}
         )
         
-        # Button frame for Play and Multiplayer
+        # Button frame for Play, Multiplayer, and Language Switch
         self.button_frame = Frame(self.root)
         self.button_frame.grid(column=1, row=1)
         
         # Play button (local 2-player)
         self.play_button = Button(
             self.button_frame,
-            text=PLAY_BUTTON_TEXT,
+            text=i18n.t("PLAY_BUTTON_TEXT"),
             font=BUTTON_FONT,
             command=self._start_game
         )
@@ -129,26 +130,58 @@ class TicTacToeApp:
         # Multiplayer button
         self.multiplayer_button = Button(
             self.button_frame,
-            text=MULTIPLAYER_BUTTON_TEXT,
+            text=i18n.t("MULTIPLAYER_BUTTON_TEXT"),
             font=BUTTON_FONT,
             command=self._show_multiplayer_dialog
         )
         self.multiplayer_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
+
+        # Language switch button
+        self.lang_button = Button(
+            self.button_frame,
+            text=i18n.t("LANG_SWITCH_BUTTON_TEXT"),
+            font=BUTTON_FONT,
+            command=self._toggle_language
+        )
+        self.lang_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
         
         # Help menu
+        self._setup_help_menu()
+
+    def _setup_help_menu(self):
+        """Configure or refresh the Help menu with localized strings."""
         create_help_menu(
             self.root,
             self._change_theme,
             self._show_about,
             self.root.destroy,
-            CHANGE_THEME_TEXT,
-            ABOUT_TEXT,
-            EXIT_MENU_TEXT,
-            HELP_MENU_TEXT,
+            i18n.t("CHANGE_THEME_TEXT"),
+            i18n.t("ABOUT_TEXT"),
+            i18n.t("EXIT_MENU_TEXT"),
+            i18n.t("HELP_MENU_TEXT"),
             MENU_TEAROFF,
             check_updates_command=self._check_updates_manual,
-            CHECK_UPDATES_MENU_TEXT=CHECK_UPDATES_MENU_TEXT
+            CHECK_UPDATES_MENU_TEXT=i18n.t("CHECK_UPDATES_MENU_TEXT"),
+            toggle_language_command=self._toggle_language,
+            LANGUAGE_MENU_TEXT=i18n.t("LANGUAGE_MENU_TEXT")
         )
+
+    def _toggle_language(self):
+        """Toggle application language between Arabic and English."""
+        i18n.toggle_language()
+        self._update_ui_language()
+
+    def _update_ui_language(self):
+        """Update all dynamic UI text to the current language."""
+        self.root.title(i18n.t("WINDOW_TITLE"))
+        self.title_label.config(text=i18n.t("WINDOW_TITLE"))
+        if not self.state.game_active:
+            self.play_button.config(text=i18n.t("PLAY_BUTTON_TEXT"))
+        else:
+            self.play_button.config(text=i18n.t("EXIT_BUTTON_TEXT"))
+        self.multiplayer_button.config(text=i18n.t("MULTIPLAYER_BUTTON_TEXT"))
+        self.lang_button.config(text=i18n.t("LANG_SWITCH_BUTTON_TEXT"))
+        self._setup_help_menu()
     
     def _create_connection_indicator(self):
         """Create the connection status indicator on the game board."""
@@ -187,8 +220,9 @@ class TicTacToeApp:
     def _start_game(self):
         """Start a local 2-player game."""
         self.is_multiplayer_mode = False
-        self.play_button.configure(text=EXIT_BUTTON_TEXT, command=self._exit_game)
+        self.play_button.configure(text=i18n.t("EXIT_BUTTON_TEXT"), command=self._exit_game)
         self.multiplayer_button.pack_forget()  # Hide multiplayer button during game
+        self.lang_button.pack_forget()         # Hide language switch button during game
         self.view.swap_canvas_sizes(game_active=True)
         self.view.clear_board()
         self.root.after(UI_SETUP_DELAY, self._setup_game)
@@ -207,8 +241,9 @@ class TicTacToeApp:
         """Clean up game UI and return to main menu."""
         self.view.cleanup_game_ui()
         self.view.swap_canvas_sizes(game_active=False)
-        self.play_button.configure(text=PLAY_BUTTON_TEXT, command=self._start_game)
-        self.multiplayer_button.pack(side='left', padx=5, ipadx=BUTTON_PADDING_X)
+        self.play_button.configure(text=i18n.t("PLAY_BUTTON_TEXT"), command=self._start_game)
+        self.multiplayer_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
+        self.lang_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
         self._destroy_connection_indicator()
     
     # =========================================================================
@@ -234,7 +269,7 @@ class TicTacToeApp:
         ip_address = self.server.get_local_ip()
         
         if not self.server.start():
-            msg.showerror("\u062e\u0637\u0623", "\u0641\u0634\u0644 \u0641\u064a \u0628\u062f\u0621 \u0627\u0644\u0633\u064a\u0631\u0641\u0631. \u0642\u062f \u064a\u0643\u0648\u0646 \u0627\u0644\u0645\u0646\u0641\u0630 \u0642\u064a\u062f \u0627\u0644\u0627\u0633\u062a\u062e\u062f\u0627\u0645.")
+            msg.showerror(i18n.t("ERROR_TITLE"), i18n.t("HOST_SERVER_ERROR"))
             return
         
         # Set up callbacks
@@ -282,8 +317,9 @@ class TicTacToeApp:
         self.view.set_controller(self.network_controller)
         
         # Set up UI
-        self.play_button.configure(text=EXIT_BUTTON_TEXT, command=self._exit_multiplayer_game)
+        self.play_button.configure(text=i18n.t("EXIT_BUTTON_TEXT"), command=self._exit_multiplayer_game)
         self.multiplayer_button.pack_forget()
+        self.lang_button.pack_forget()
         self.view.swap_canvas_sizes(game_active=True)
         self.view.clear_board()
         
@@ -378,8 +414,9 @@ class TicTacToeApp:
         self.view.set_controller(self.network_controller)
         
         # Set up UI
-        self.play_button.configure(text=EXIT_BUTTON_TEXT, command=self._exit_multiplayer_game)
+        self.play_button.configure(text=i18n.t("EXIT_BUTTON_TEXT"), command=self._exit_multiplayer_game)
         self.multiplayer_button.pack_forget()
+        self.lang_button.pack_forget()
         self.view.swap_canvas_sizes(game_active=True)
         self.view.clear_board()
         
@@ -400,7 +437,7 @@ class TicTacToeApp:
     def _on_opponent_disconnected(self):
         """Called when opponent disconnects during game."""
         self._update_connection_indicator(False)
-        msg.showwarning("\u062a\u0645 \u0642\u0637\u0639 \u0627\u0644\u0627\u062a\u0635\u0627\u0644", "\u0644\u0642\u062f \u0627\u0646\u0642\u0637\u0639 \u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u062e\u0635\u0645!")
+        msg.showwarning(i18n.t("DISCONNECTED_TITLE"), i18n.t("OPPONENT_DISCONNECTED"))
         self._exit_multiplayer_game()
     
     def _exit_multiplayer_game(self):
@@ -443,9 +480,9 @@ class TicTacToeApp:
     
     def _show_about(self):
         """Show about dialog."""
-        msg.showinfo(ABOUT_TITLE, ABOUT_MESSAGE)
+        msg.showinfo(i18n.t("ABOUT_TITLE"), i18n.t("ABOUT_MESSAGE", version=__version__))
         
-        if msg.askyesno(FEEDBACK_TITLE, FEEDBACK_MESSAGE):
+        if msg.askyesno(i18n.t("FEEDBACK_TITLE"), i18n.t("FEEDBACK_MESSAGE")):
             webbrowser.open(GITHUB_URL)
     
     def _check_updates_silent(self):
@@ -480,21 +517,17 @@ class TicTacToeApp:
                     self.pending_mandatory_manifest = manifest
                 self.root.after(0, lambda: self._show_update_dialog(manifest, is_mandatory))
             elif error:
-                self.root.after(0, lambda: msg.showwarning(UPDATE_CHECK_ERROR_TITLE, UPDATE_CHECK_ERROR_MESSAGE))
+                self.root.after(0, lambda: msg.showwarning(i18n.t("UPDATE_CHECK_ERROR_TITLE"), i18n.t("UPDATE_CHECK_ERROR_MESSAGE")))
             else:
                 self.pending_mandatory_manifest = None
-                self.root.after(0, lambda: msg.showinfo(UP_TO_DATE_TITLE, UP_TO_DATE_MESSAGE))
+                self.root.after(0, lambda: msg.showinfo(i18n.t("UP_TO_DATE_TITLE"), i18n.t("UP_TO_DATE_MESSAGE", version=__version__)))
         
         self.update_service.check_async(is_manual=True, on_result=on_result)
     
     def _show_mandatory_update_lockout_prompt(self, manifest: UpdateManifest):
         """Prompt the player that multiplayer is locked until mandatory update is applied."""
-        title = "تحديث إلزامي مطلوب"
-        message = (
-            f"يتطلب اللعب عبر الشبكة تحديث اللعبة إلى الإصدار v{manifest.version} "
-            "للتوافق مع خوادم اللعب الجماعي.\n\n"
-            "هل ترغب في فتح نافذة التحديث الآن؟"
-        )
+        title = i18n.t("MANDATORY_LOCKOUT_TITLE")
+        message = i18n.t("MANDATORY_LOCKOUT_MESSAGE", version=manifest.version)
         if msg.askyesno(title, message, icon="warning"):
             self._show_update_dialog(manifest, is_mandatory=True)
 

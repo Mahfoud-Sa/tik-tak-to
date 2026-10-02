@@ -11,6 +11,10 @@ from network_config import (
     STATUS_CONNECTED_COLOR, STATUS_DISCONNECTED_COLOR, STATUS_WAITING_COLOR,
     PLAYER_CONNECTED_TEXT, PLAYER_DISCONNECTED_TEXT, DEFAULT_PORT
 )
+try:
+    from utils.i18n import i18n
+except ImportError:
+    from game.utils.i18n import i18n
 
 
 class MultiplayerModeDialog:
@@ -26,7 +30,7 @@ class MultiplayerModeDialog:
             on_join: Callback when Join is selected
         """
         self.dialog = Toplevel(parent)
-        self.dialog.title("وضع متعدد اللاعبين")
+        self.dialog.title(i18n.t("MULTIPLAYER_MODE_TITLE"))
         self.dialog.resizable(False, False)
         self.dialog.transient(parent)
         self.dialog.grab_set()
@@ -65,7 +69,7 @@ class MultiplayerModeDialog:
         # Title
         title = Label(
             self.dialog,
-            text="اختر وضع اللعب",
+            text=i18n.t("CHOOSE_GAME_MODE"),
             font=('Arial', 14, 'bold')
         )
         title.pack(pady=20)
@@ -77,7 +81,7 @@ class MultiplayerModeDialog:
         # Host button
         host_btn = Button(
             btn_frame,
-            text=f"🖥️ {HOST_GAME_TEXT}",
+            text=f"🖥️ {i18n.t('HOST_GAME_TEXT')}",
             font=('Arial', 11),
             width=15,
             command=self._on_host_click
@@ -87,7 +91,7 @@ class MultiplayerModeDialog:
         # Join button
         join_btn = Button(
             btn_frame,
-            text=f"🔗 {JOIN_GAME_TEXT}",
+            text=f"🔗 {i18n.t('JOIN_GAME_TEXT')}",
             font=('Arial', 11),
             width=15,
             command=self._on_join_click
@@ -97,7 +101,7 @@ class MultiplayerModeDialog:
         # Cancel button
         cancel_btn = Button(
             self.dialog,
-            text=f"❌ {CANCEL_TEXT}",
+            text=f"❌ {i18n.t('CANCEL_TEXT')}",
             font=('Arial', 8),
             width=15,
             command=self.close
@@ -142,7 +146,7 @@ class HostGameDialog:
             on_refresh: Callback when refresh clicked
         """
         self.dialog = Toplevel(parent)
-        self.dialog.title("استضافة لعبة")
+        self.dialog.title(i18n.t("HOST_GAME_TEXT"))
         self.dialog.resizable(False, False)
         self.dialog.transient(parent)
         self.dialog.grab_set()
@@ -184,7 +188,7 @@ class HostGameDialog:
         # Title
         title = Label(
             self.dialog,
-            text="جاري الاستضافة",
+            text=i18n.t("HOST_GAME_TEXT"),
             font=('Arial', 14, 'bold')
         )
         title.pack(pady=15)
@@ -195,7 +199,7 @@ class HostGameDialog:
         
         ip_label = Label(
             ip_frame,
-            text=YOUR_IP_TEXT,
+            text=i18n.t("YOUR_IP_TEXT"),
             font=('Arial', 11)
         )
         ip_label.pack(side='left')
@@ -238,7 +242,7 @@ class HostGameDialog:
         # Status text
         self._status_label = Label(
             status_frame,
-            text=WAITING_TEXT,
+            text=i18n.t("WAITING_TEXT"),
             font=('Arial', 11)
         )
         self._status_label.pack(side='left')
@@ -250,7 +254,7 @@ class HostGameDialog:
         # Refresh button
         self._refresh_btn = Button(
             btn_frame,
-            text=f"🔄 {REFRESH_TEXT}",
+            text=f"🔄 {i18n.t('REFRESH_TEXT')}",
             font=('Arial', 10),
             width=10,
             command=self._on_refresh_click
@@ -260,7 +264,7 @@ class HostGameDialog:
         # Cancel button
         cancel_btn = Button(
             btn_frame,
-            text=f"❌ {CANCEL_TEXT}",
+            text=f"❌ {i18n.t('CANCEL_TEXT')}",
             font=('Arial', 10),
             width=10,
             command=self._on_cancel_click
@@ -275,13 +279,13 @@ class HostGameDialog:
                 self._status_circle,
                 fill=STATUS_CONNECTED_COLOR
             )
-            self._status_label.config(text=PLAYER_CONNECTED_TEXT)
+            self._status_label.config(text=i18n.t("PLAYER_CONNECTED_TEXT"))
         else:
             self._status_canvas.itemconfig(
                 self._status_circle,
                 fill=STATUS_DISCONNECTED_COLOR
             )
-            self._status_label.config(text=PLAYER_DISCONNECTED_TEXT)
+            self._status_label.config(text=i18n.t("PLAYER_DISCONNECTED_TEXT"))
     
     def set_waiting(self):
         """Set status to waiting."""
@@ -290,7 +294,7 @@ class HostGameDialog:
             self._status_circle,
             fill=STATUS_WAITING_COLOR
         )
-        self._status_label.config(text=WAITING_TEXT)
+        self._status_label.config(text=i18n.t("WAITING_TEXT"))
     
     def _on_refresh_click(self):
         """Handle refresh button click."""
@@ -329,7 +333,7 @@ class JoinGameDialog:
             on_cancel: Callback when cancelled
         """
         self.dialog = Toplevel(parent)
-        self.dialog.title("الانضمام للعبة")
+        self.dialog.title(i18n.t("JOIN_GAME_TEXT"))
         self.dialog.resizable(False, False)
         self.dialog.transient(parent)
         self.dialog.grab_set()
@@ -370,7 +374,7 @@ class JoinGameDialog:
         # Title
         title = Label(
             self.dialog,
-            text="الانضمام للعبة",
+            text=i18n.t("JOIN_GAME_TEXT"),
             font=('Arial', 14, 'bold')
         )
         title.pack(pady=15)
@@ -381,7 +385,7 @@ class JoinGameDialog:
         
         ip_label = Label(
             ip_frame,
-            text=ENTER_IP_TEXT,
+            text=i18n.t("ENTER_IP_TEXT"),
             font=('Arial', 11)
         )
         ip_label.pack(side='left', padx=5)
@@ -426,7 +430,7 @@ class JoinGameDialog:
         # Status text
         self._status_label = Label(
             status_frame,
-            text="غير متصل",
+            text=i18n.t("CONNECTION_FAILED_TEXT"),
             font=('Arial', 11)
         )
         self._status_label.pack(side='left')
@@ -438,7 +442,7 @@ class JoinGameDialog:
         # Connect button
         self._connect_btn = Button(
             btn_frame,
-            text=f"🔗 {CONNECT_TEXT}",
+            text=f"🔗 {i18n.t('CONNECT_TEXT')}",
             font=('Arial', 10),
             width=10,
             command=self._on_connect_click
@@ -448,7 +452,7 @@ class JoinGameDialog:
         # Refresh button
         self._refresh_btn = Button(
             btn_frame,
-            text=f"🔄 {REFRESH_TEXT}",
+            text=f"🔄 {i18n.t('REFRESH_TEXT')}",
             font=('Arial', 10),
             width=10,
             command=self._on_refresh_click
@@ -458,7 +462,7 @@ class JoinGameDialog:
         # Cancel button
         cancel_btn = Button(
             btn_frame,
-            text=f"❌ {CANCEL_TEXT}",
+            text=f"❌ {i18n.t('CANCEL_TEXT')}",
             font=('Arial', 10),
             width=10,
             command=self._on_cancel_click
@@ -476,13 +480,13 @@ class JoinGameDialog:
                 self._status_circle,
                 fill=STATUS_CONNECTED_COLOR
             )
-            self._status_label.config(text=CONNECTED_TEXT)
+            self._status_label.config(text=i18n.t("CONNECTED_TEXT"))
         else:
             self._status_canvas.itemconfig(
                 self._status_circle,
                 fill=STATUS_DISCONNECTED_COLOR
             )
-            self._status_label.config(text=PLAYER_DISCONNECTED_TEXT)
+            self._status_label.config(text=i18n.t("PLAYER_DISCONNECTED_TEXT"))
     
     def set_connecting(self):
         """Set status to connecting."""
@@ -490,7 +494,7 @@ class JoinGameDialog:
             self._status_circle,
             fill=STATUS_WAITING_COLOR
         )
-        self._status_label.config(text="جاري الاتصال...")
+        self._status_label.config(text=i18n.t("CONNECT_TEXT") + "...")
     
     def set_error(self, message: str):
         """Set status to error."""

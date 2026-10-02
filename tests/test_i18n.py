@@ -1,0 +1,136 @@
+"""
+Tests for Internationalization (i18n) and Arabic/English Language Switching.
+Verifies:
+- Default language is Arabic.
+- Translation lookup in Arabic and English.
+- Dynamic language switching (toggle_language and set_language).
+- Listener subscription and notification upon language change.
+- Persistence of user language preference.
+"""
+
+import os
+import sys
+import tempfile
+import unittest
+from unittest.mock import patch, MagicMock
+
+# Add game directory to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'game')))
+
+try:
+    from utils.i18n import I18n, i18n
+except ImportError:
+    from game.utils.i18n import I18n, i18n
+
+
+class TestI18n(unittest.TestCase):
+    """Test suite for localization service."""
+
+    def setUp(self):
+        self.temp_settings = tempfile.NamedTemporaryFile(delete=False)
+        self.temp_settings.close()
+        self.i18n_instance = I18n(settings_file=self.temp_settings.name, default_lang="ar")
+
+    def tearDown(self):
+        if os.path.exists(self.temp_settings.name):
+            os.remove(self.temp_settings.name)
+
+    def test_default_language_is_arabic(self):
+        self.assertEqual(self.i18n_instance.get_language(), "ar")
+        self.assertEqual(self.i18n_instance.t("PLAY_BUTTON_TEXT"), "ابدأ اللعب")
+        self.assertEqual(self.i18n_instance.t("WINDOW_TITLE"), "لعبة إكس أو")
+
+    def test_switch_to_english(self):
+        self.i18n_instance.set_language("en")
+        self.assertEqual(self.i18n_instance.get_language(), "en")
+        self.assertEqual(self.i18n_instance.t("PLAY_BUTTON_TEXT"), "Play Game")
+        self.assertEqual(self.i18n_instance.t("WINDOW_TITLE"), "XO Game")
+        self.assertEqual(self.i18n_instance.t("MULTIPLAYER_BUTTON_TEXT"), "Multiplayer")
+
+    def test_toggle_language(self):
+        # Starts in ar
+        self.assertEqual(self.i18n_instance.get_language(), "ar")
+        new_lang = self.i18n_instance.toggle_language()
+        self.assertEqual(new_lang, "en")
+        self.assertEqual(self.i18n_instance.get_language(), "en")
+        self.assertEqual(self.i18n_instance.t("PLAY_BUTTON_TEXT"), "Play Game")
+
+        # Toggle back to ar
+        new_lang = self.i18n_instance.toggle_language()
+        self.assertEqual(new_lang, "ar")
+        self.assertEqual(self.i18n_instance.get_language(), "ar")
+        self.assertEqual(self.i18n_instance.t("PLAY_BUTTON_TEXT"), "ابدأ اللعب")
+
+    def test_string_formatting_interpolation(self):
+        ar_msg = self.i18n_instance.t("UP_TO_DATE_MESSAGE", version="5.0.0")
+        self.assertIn("v5.0.0", ar_msg)
+        self.assertIn("أنت تستخدم بالفعل", ar_msg)
+
+        self.i18n_instance.set_language("en")
+        en_msg = self.i18n_instance.t("UP_TO_DATE_MESSAGE", version="5.0.0")
+        self.assertIn("v5.0.0", en_msg)
+        self.assertIn("already using the latest version", en_msg)
+
+    def test_subscribers_notified_on_language_change(self):
+        notifications = []
+
+        def listener():
+            notifications.append(self.i18n_instance.get_language())
+
+        self.i18n_instance.subscribe(listener)
+        self.i18n_instance.set_language("en")
+        self.i18n_instance.set_language("ar")
+
+        self.assertEqual(notifications, ["en", "ar"])
+
+    def test_language_persistence(self):
+        self.i18n_instance.set_language("en")
+
+        # Create new instance with same settings file
+        new_instance = I18n(settings_file=self.temp_settings.name)
+        self.assertEqual(new_instance.get_language(), "en")
+
+
+class TestAppLanguageSwitch(unittest.TestCase):
+    """Test suite for TicTacToeApp dynamic language toggle integration."""
+
+    @patch('main.create_help_menu')
+    @patch('main.GameView')
+    @patch('main.GameController')
+    @patch('main.GameState')
+    @patch('main.Tk')
+    def test_app_toggle_language_updates_ui(
+        self, mock_tk, mock_state, mock_ctrl, mock_view, mock_help
+    ):
+        from main import TicTacToeApp
+        mock_state.return_value.game_active = False
+        app = TicTacToeApp()
+
+        # Set initial language to Arabic
+        i18n.set_language("ar")
+        with patch.object(app.play_button, 'config') as mock_play_cfg, \
+             patch.object(app.lang_button, 'config') as mock_lang_cfg:
+            app._update_ui_language()
+            mock_play_cfg.assert_called_with(text="ابدأ اللعب")
+            mock_lang_cfg.assert_called_with(text="🌐 English")
+
+        # Toggle to English
+        with patch.object(app.play_button, 'config') as mock_play_cfg, \
+             patch.object(app.lang_button, 'config') as mock_lang_cfg:
+            app._toggle_language()
+            self.assertEqual(i18n.get_language(), "en")
+            mock_play_cfg.assert_called_with(text="Play Game")
+            mock_lang_cfg.assert_called_with(text="🌐 العربية")
+
+        # Toggle back to Arabic
+        with patch.object(app.play_button, 'config') as mock_play_cfg, \
+             patch.object(app.lang_button, 'config') as mock_lang_cfg:
+            app._toggle_language()
+            self.assertEqual(i18n.get_language(), "ar")
+            mock_play_cfg.assert_called_with(text="ابدأ اللعب")
+            mock_lang_cfg.assert_called_with(text="🌐 English")
+
+
+if __name__ == '__main__':
+    unittest.main()
+

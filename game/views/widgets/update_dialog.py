@@ -11,6 +11,11 @@ from os import path
 from typing import Optional, Callable
 
 from utils.updater import UpdateManifest, UpdateService, DownloadCancellationToken
+try:
+    from utils.i18n import i18n
+except ImportError:
+    from game.utils.i18n import i18n
+
 from config import (
     ICON_PATH, BUTTON_FONT, TITLE_FONT,
     UPDATE_AVAILABLE_TITLE, UPDATE_DIALOG_HEADING,
@@ -49,7 +54,8 @@ class UpdateNotifierDialog:
         self.later_btn = None
 
         self.dialog = Toplevel(parent)
-        self.dialog.title("⚠️ تحديث إجباري" if is_mandatory else UPDATE_AVAILABLE_TITLE)
+        dialog_title = i18n.t("UPDATE_MANDATORY_TITLE") if is_mandatory else i18n.t("UPDATE_AVAILABLE_TITLE")
+        self.dialog.title(dialog_title)
         self.dialog.resizable(False, False)
         self.dialog.transient(parent)
         self.dialog.grab_set()
@@ -97,7 +103,7 @@ class UpdateNotifierDialog:
     def _create_ui(self):
         """Build dialog widgets."""
         header_bg = "#C62828" if self.is_mandatory else "#1E88E5"
-        header_text = "🚨 تحديث إجباري مطلوب!" if self.is_mandatory else f"✨ {UPDATE_DIALOG_HEADING}"
+        header_text = i18n.t("UPDATE_MANDATORY_HEADING") if self.is_mandatory else f"✨ {i18n.t('UPDATE_DIALOG_HEADING')}"
 
         # Header banner
         header_frame = Frame(self.dialog, bg=header_bg, pady=10)
@@ -119,7 +125,7 @@ class UpdateNotifierDialog:
         if self.is_mandatory:
             mand_label = Label(
                 content_frame,
-                text="⚠️ هذا التحديث إلزامي للاستمرار في اللعب والتوافق مع خوادم اللعب الجماعي.",
+                text=i18n.t("UPDATE_MANDATORY_WARNING"),
                 font=('Arial', 9, 'bold'),
                 fg="#C62828",
                 wraplength=420,
@@ -131,7 +137,7 @@ class UpdateNotifierDialog:
         version_frame = Frame(content_frame, pady=4)
         version_frame.pack(fill="x")
 
-        curr_ver_text = f"{CURRENT_VERSION_LABEL} v{self.current_version}"
+        curr_ver_text = f"{i18n.t('CURRENT_VERSION_LABEL')} v{self.current_version}"
         curr_label = Label(
             version_frame,
             text=curr_ver_text,
@@ -141,7 +147,7 @@ class UpdateNotifierDialog:
         curr_label.pack(side="right", padx=10)
 
         channel_badge = f" [{self.manifest.channel.upper()}]" if self.manifest.channel != "stable" else ""
-        new_ver_text = f"{LATEST_VERSION_LABEL} v{self.manifest.version}{channel_badge}"
+        new_ver_text = f"{i18n.t('LATEST_VERSION_LABEL')} v{self.manifest.version}{channel_badge}"
         new_label = Label(
             version_frame,
             text=new_ver_text,
@@ -153,7 +159,7 @@ class UpdateNotifierDialog:
         # Release notes header
         notes_label = Label(
             content_frame,
-            text="ما الجديد في هذا الإصدار / Release Notes:",
+            text=i18n.t("RELEASE_NOTES_HEADING"),
             font=('Arial', 9, 'bold'),
             anchor="w"
         )
@@ -180,7 +186,7 @@ class UpdateNotifierDialog:
 
         notes_content = self.manifest.release_notes.strip()
         if not notes_content:
-            notes_content = f"Release {self.manifest.tag_name}\nتحسينات وإصلاحات جديدة للميزات والاتصال الشبكي."
+            notes_content = f"Release {self.manifest.tag_name}\n" + i18n.t("UPDATE_DIALOG_HEADING")
         notes_text.insert("1.0", notes_content)
         notes_text.config(state="disabled")
 
@@ -192,7 +198,7 @@ class UpdateNotifierDialog:
         if not self.is_mandatory:
             self.later_btn = Button(
                 self.btn_frame,
-                text=LATER_BUTTON_TEXT,
+                text=i18n.t("LATER_BUTTON_TEXT"),
                 font=BUTTON_FONT,
                 width=10,
                 command=self._on_later
@@ -202,7 +208,7 @@ class UpdateNotifierDialog:
         # Download / Update button
         self.download_btn = Button(
             self.btn_frame,
-            text=f"⬇️ {DOWNLOAD_UPDATE_BUTTON_TEXT}",
+            text=f"⬇️ {i18n.t('DOWNLOAD_UPDATE_BUTTON_TEXT')}",
             font=BUTTON_FONT,
             bg="#2E7D32" if not self.is_mandatory else "#C62828",
             fg="white",
@@ -216,9 +222,8 @@ class UpdateNotifierDialog:
         """Handle download action. If running in source mode, redirect to browser."""
         if not getattr(sys, 'frozen', False):
             msg.showinfo(
-                "وضع التطوير / Development Mode",
-                "أنت تعمل حالياً من الكود المصدري (Development Mode).\n\n"
-                "سيتم فتح صفحة الإصدار في المتصفح لتحميل الحزمة يدوياً دون المساس ببيئة بايثون."
+                i18n.t("DEV_MODE_TITLE"),
+                i18n.t("DEV_MODE_MESSAGE")
             )
             target_url = self.manifest.release_page_url or self.manifest.download_url or "https://github.com/Mahfoud-Sa/tik-tak-to/releases"
             webbrowser.open(target_url)
@@ -246,7 +251,7 @@ class UpdateNotifierDialog:
         # Create progress UI
         self._progress_label = Label(
             self.btn_frame,
-            text="جاري بدء التحميل...",
+            text=i18n.t("DOWNLOADING_PROGRESS", received=0.0, total=0.0, percent=0.0),
             font=('Arial', 9),
             fg="#444444"
         )
@@ -262,7 +267,7 @@ class UpdateNotifierDialog:
 
         self._cancel_btn = Button(
             self.btn_frame,
-            text="إلغاء",
+            text=i18n.t("CANCEL_TEXT"),
             font=BUTTON_FONT,
             width=8,
             command=self._on_cancel_download
@@ -289,7 +294,7 @@ class UpdateNotifierDialog:
                 tot_mb = total / (1024 * 1024) if total > 0 else 0
                 self._progress_bar['value'] = pct
                 self._progress_label.config(
-                    text=f"جاري التحميل... {rec_mb:.1f} MB / {tot_mb:.1f} MB ({pct:.0f}%)"
+                    text=i18n.t("DOWNLOADING_PROGRESS", received=rec_mb, total=tot_mb, percent=pct)
                 )
 
             self.dialog.after(0, update)
@@ -335,19 +340,19 @@ class UpdateNotifierDialog:
                     if self.on_apply_update:
                         self.on_apply_update(filepath)
                     else:
-                        msg.showinfo("اكتمل التحميل", f"تم تحميل التحديث بنجاح إلى:\n{filepath}")
+                        msg.showinfo(
+                            i18n.t("DOWNLOAD_COMPLETE_TITLE"),
+                            i18n.t("DOWNLOAD_COMPLETE_MESSAGE", path=filepath)
+                        )
                 else:
                     if self._cancel_token and self._cancel_token.is_cancelled:
                         self._restore_action_buttons()
                         return
 
                     target_url = self.manifest.release_page_url or self.manifest.download_url or "https://github.com/Mahfoud-Sa/tik-tak-to/releases"
-                    err_msg = error or "حدث خطأ غير متوقع أثناء التحميل."
-                    prompt = (
-                        f"فشل تحميل التحديث:\n{err_msg}\n\n"
-                        "هل ترغب في فتح صفحة الإصدار في المتصفح للتحميل يدوياً؟"
-                    )
-                    if msg.askyesno("فشل التحميل", prompt, icon="error"):
+                    err_msg = error or i18n.t("UPDATE_CHECK_ERROR_TITLE")
+                    prompt = i18n.t("DOWNLOAD_FAILED_PROMPT", error=err_msg)
+                    if msg.askyesno(i18n.t("DOWNLOAD_FAILED_TITLE"), prompt, icon="error"):
                         webbrowser.open(target_url)
                         self.dialog.destroy()
                     else:
