@@ -9,7 +9,7 @@ Multiplayer support added - 2024
 
 import webbrowser
 from typing import Optional
-from tkinter import Tk, PhotoImage, Button, Frame, Canvas
+from tkinter import Tk, PhotoImage, Button, Frame, Canvas, ttk
 from tkinter import messagebox as msg
 from os import path
 
@@ -137,14 +137,17 @@ class TicTacToeApp:
         )
         self.multiplayer_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
 
-        # Language switch button
-        self.lang_button = Button(
+        # Language dropdown selector
+        self.lang_dropdown = ttk.Combobox(
             self.button_frame,
-            text=i18n.t("LANG_SWITCH_BUTTON_TEXT"),
-            font=BUTTON_FONT,
-            command=self._toggle_language
+            values=["العربية", "English"],
+            state="readonly",
+            justify="center",
+            font=BUTTON_FONT
         )
-        self.lang_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
+        self.lang_dropdown.set("العربية" if i18n.get_language() == "ar" else "English")
+        self.lang_dropdown.bind("<<ComboboxSelected>>", self._on_language_selected)
+        self.lang_dropdown.pack(side='top', pady=5)
         
         # Help menu
         self._setup_help_menu()
@@ -162,15 +165,16 @@ class TicTacToeApp:
             i18n.t("HELP_MENU_TEXT"),
             MENU_TEAROFF,
             check_updates_command=self._check_updates_manual,
-            CHECK_UPDATES_MENU_TEXT=i18n.t("CHECK_UPDATES_MENU_TEXT"),
-            toggle_language_command=self._toggle_language,
-            LANGUAGE_MENU_TEXT=i18n.t("LANGUAGE_MENU_TEXT")
+            CHECK_UPDATES_MENU_TEXT=i18n.t("CHECK_UPDATES_MENU_TEXT")
         )
 
-    def _toggle_language(self):
-        """Toggle application language between Arabic and English."""
-        i18n.toggle_language()
-        self._update_ui_language()
+    def _on_language_selected(self, event=None):
+        """Handle language selection from the dropdown."""
+        selected_text = self.lang_dropdown.get()
+        new_lang = "ar" if selected_text == "العربية" else "en"
+        if new_lang != i18n.get_language():
+            i18n.set_language(new_lang)
+            self._update_ui_language()
 
     def _update_ui_language(self):
         """Update all dynamic UI text and layout direction to the current language."""
@@ -181,7 +185,9 @@ class TicTacToeApp:
         else:
             self.play_button.config(text=i18n.t("EXIT_BUTTON_TEXT"))
         self.multiplayer_button.config(text=i18n.t("MULTIPLAYER_BUTTON_TEXT"))
-        self.lang_button.config(text=i18n.t("LANG_SWITCH_BUTTON_TEXT"))
+        current_display = "العربية" if i18n.get_language() == "ar" else "English"
+        if self.lang_dropdown.get() != current_display:
+            self.lang_dropdown.set(current_display)
         self._setup_help_menu()
         self.view.update_layout_direction()
         if self._status_canvas and self._status_canvas.winfo_exists():
@@ -230,7 +236,7 @@ class TicTacToeApp:
         self.is_multiplayer_mode = False
         self.play_button.configure(text=i18n.t("EXIT_BUTTON_TEXT"), command=self._exit_game)
         self.multiplayer_button.pack_forget()  # Hide multiplayer button during game
-        self.lang_button.pack_forget()         # Hide language switch button during game
+        self.lang_dropdown.pack_forget()       # Hide language dropdown during game
         self.view.swap_canvas_sizes(game_active=True)
         self.view.clear_board()
         self.root.after(UI_SETUP_DELAY, self._setup_game)
@@ -251,7 +257,7 @@ class TicTacToeApp:
         self.view.swap_canvas_sizes(game_active=False)
         self.play_button.configure(text=i18n.t("PLAY_BUTTON_TEXT"), command=self._start_game)
         self.multiplayer_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
-        self.lang_button.pack(side='top', pady=5, ipadx=BUTTON_PADDING_X)
+        self.lang_dropdown.pack(side='top', pady=5)
         self._destroy_connection_indicator()
     
     # =========================================================================
@@ -327,7 +333,7 @@ class TicTacToeApp:
         # Set up UI
         self.play_button.configure(text=i18n.t("EXIT_BUTTON_TEXT"), command=self._exit_multiplayer_game)
         self.multiplayer_button.pack_forget()
-        self.lang_button.pack_forget()
+        self.lang_dropdown.pack_forget()
         self.view.swap_canvas_sizes(game_active=True)
         self.view.clear_board()
         
@@ -424,7 +430,7 @@ class TicTacToeApp:
         # Set up UI
         self.play_button.configure(text=i18n.t("EXIT_BUTTON_TEXT"), command=self._exit_multiplayer_game)
         self.multiplayer_button.pack_forget()
-        self.lang_button.pack_forget()
+        self.lang_dropdown.pack_forget()
         self.view.swap_canvas_sizes(game_active=True)
         self.view.clear_board()
         

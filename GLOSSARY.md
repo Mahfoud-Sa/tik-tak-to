@@ -28,3 +28,8 @@ _Avoid_: Ignored update, muted release
 The visual presentation flow where layout hierarchy, scoreboard column positioning, and dialog widget packing mirror between Right-to-Left (for Arabic) and Left-to-Right (for English), while keeping the spatial 3x3 game board coordinates fixed.
 _Avoid_: Canvas inversion, board coordinate mirroring, text-only translation
 
+**Language Selector (محدد اللغة)**:
+The primary in-window dropdown control (combobox) allowing runtime switching between native language choices ("العربية" and "English") with immediate layout and preference persistence.
+_Avoid_: Language switch button, toggle button, lang button
+
+

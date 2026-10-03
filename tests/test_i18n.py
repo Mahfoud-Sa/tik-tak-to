@@ -143,14 +143,14 @@ class TestI18n(unittest.TestCase):
 
 
 class TestAppLanguageSwitch(unittest.TestCase):
-    """Test suite for TicTacToeApp dynamic language toggle integration."""
+    """Test suite for TicTacToeApp dynamic language dropdown integration."""
 
     @patch('main.create_help_menu')
     @patch('main.GameView')
     @patch('main.GameController')
     @patch('main.GameState')
     @patch('main.Tk')
-    def test_app_toggle_language_updates_ui(
+    def test_app_language_dropdown_updates_ui(
         self, mock_tk, mock_state, mock_ctrl, mock_view, mock_help
     ):
         import main
@@ -160,29 +160,60 @@ class TestAppLanguageSwitch(unittest.TestCase):
         mock_state.return_value.game_active = False
         app = TicTacToeApp()
 
-        # Set initial language to Arabic
+        # lang_button should no longer exist
+        self.assertFalse(hasattr(app, 'lang_button'))
+
+        # lang_dropdown should exist
+        self.assertTrue(hasattr(app, 'lang_dropdown'))
+
+        # When locale updates, dropdown label is synchronized
+        app_i18n.set_language("en")
+        with patch.object(app.play_button, 'config') as mock_play_cfg, \
+             patch.object(app.lang_dropdown, 'set') as mock_set:
+            app._update_ui_language()
+            mock_play_cfg.assert_called_with(text="Play Game")
+            mock_set.assert_called_with("English")
+
         app_i18n.set_language("ar")
         with patch.object(app.play_button, 'config') as mock_play_cfg, \
-             patch.object(app.lang_button, 'config') as mock_lang_cfg:
+             patch.object(app.lang_dropdown, 'set') as mock_set:
             app._update_ui_language()
             mock_play_cfg.assert_called_with(text="ابدأ اللعب")
-            mock_lang_cfg.assert_called_with(text="🌐 English")
+            mock_set.assert_called_with("العربية")
 
-        # Toggle to English
-        with patch.object(app.play_button, 'config') as mock_play_cfg, \
-             patch.object(app.lang_button, 'config') as mock_lang_cfg:
-            app._toggle_language()
+        # When selecting English from dropdown, language switches to 'en'
+        with patch.object(app.lang_dropdown, 'get', return_value="English"):
+            app._on_language_selected()
             self.assertEqual(app_i18n.get_language(), "en")
-            mock_play_cfg.assert_called_with(text="Play Game")
-            mock_lang_cfg.assert_called_with(text="🌐 العربية")
 
-        # Toggle back to Arabic
-        with patch.object(app.play_button, 'config') as mock_play_cfg, \
-             patch.object(app.lang_button, 'config') as mock_lang_cfg:
-            app._toggle_language()
+        # When selecting Arabic from dropdown, language switches to 'ar'
+        with patch.object(app.lang_dropdown, 'get', return_value="العربية"):
+            app._on_language_selected()
             self.assertEqual(app_i18n.get_language(), "ar")
-            mock_play_cfg.assert_called_with(text="ابدأ اللعب")
-            mock_lang_cfg.assert_called_with(text="🌐 English")
+
+    @patch('main.create_help_menu')
+    @patch('main.GameView')
+    @patch('main.GameController')
+    @patch('main.GameState')
+    @patch('main.Tk')
+    def test_app_language_dropdown_lifecycle(
+        self, mock_tk, mock_state, mock_ctrl, mock_view, mock_help
+    ):
+        import main
+        from main import TicTacToeApp
+        mock_state.return_value.is_game_active = False
+        mock_state.return_value.game_active = False
+        app = TicTacToeApp()
+
+        with patch.object(app.lang_dropdown, 'pack_forget') as mock_forget:
+            app._start_game()
+            mock_forget.assert_called()
+
+        with patch.object(app.lang_dropdown, 'pack') as mock_pack:
+            app._cleanup_game_ui()
+            mock_pack.assert_called_with(side='top', pady=5)
+
+
 
 
 if __name__ == '__main__':
