@@ -191,7 +191,7 @@ def main():
     parser.add_argument("--min-supported-version", default="", help="Minimum supported version")
     parser.add_argument("--mandatory", action="store_true", help="Mark update as mandatory")
     parser.add_argument("--download-url", default="", help="Direct download URL for Windows release")
-    parser.add_argument("--file-name", default="XO_Game-windows-x64.zip", help="Artifact file name")
+    parser.add_argument("--file-name", default="Tik_Tak_Tok-windows-x64.zip", help="Artifact file name")
     parser.add_argument("--sha256", default="", help="SHA256 checksum of artifact")
     parser.add_argument("--output", default="version.json", help="Output file path")
     parser.add_argument("--history-file", default="", help="Path to releases.json history file to update")

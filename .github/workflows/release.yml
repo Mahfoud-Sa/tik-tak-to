@@ -164,7 +164,7 @@ jobs:
           # Find previous tag
           PREV_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || echo "")
           
-          echo "## XO Game ${TAG}" > "$NOTES_FILE"
+          echo "## Tik Tak Tok ${TAG}" > "$NOTES_FILE"
           echo "" >> "$NOTES_FILE"
           
           CUSTOM="${{ steps.meta.outputs.custom_notes }}"
@@ -187,7 +187,10 @@ jobs:
       - name: Generate Public Update Manifest
         shell: bash
         run: |
-          ZIP_NAME="XO_Game-${{ steps.meta.outputs.tag }}-windows-x64.zip"
+          ZIP_NAME="Tik_Tak_Tok-${{ steps.meta.outputs.tag }}-windows-x64.zip"
+          if [ ! -f "dist/$ZIP_NAME" ]; then
+            ZIP_NAME="XO_Game-${{ steps.meta.outputs.tag }}-windows-x64.zip"
+          fi
           ZIP_SHA256=$(grep "$ZIP_NAME" dist/checksums.txt | awk '{print $1}')
           
           MANDATORY_FLAG=""
@@ -234,29 +237,36 @@ jobs:
             PRERELEASE_FLAG="--prerelease"
           fi
           
-          ZIP_NAME="XO_Game-${TAG}-windows-x64.zip"
+          ZIP_NAME="Tik_Tak_Tok-${TAG}-windows-x64.zip"
+          if [ ! -f "dist/$ZIP_NAME" ]; then
+            ZIP_NAME="XO_Game-${TAG}-windows-x64.zip"
+          fi
+          EXE_NAME="Tik Tak Tok.exe"
+          if [ ! -f "dist/$EXE_NAME" ]; then
+            EXE_NAME="XO_Game.exe"
+          fi
           
           # Check if release already exists (supports safe reruns)
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists. Uploading updated assets and updating notes..."
             gh release upload "$TAG" \
-              "dist/XO_Game.exe" \
+              "dist/$EXE_NAME" \
               "dist/$ZIP_NAME" \
               "dist/checksums.txt" \
               "dist/version.json" \
               --clobber
             gh release edit "$TAG" \
-              --title "XO Game $TAG" \
+              --title "Tik Tak Tok $TAG" \
               --notes-file "dist/release_notes.md" \
               $PRERELEASE_FLAG
           else
             echo "Creating new release $TAG..."
             gh release create "$TAG" \
-              "dist/XO_Game.exe" \
+              "dist/$EXE_NAME" \
               "dist/$ZIP_NAME" \
               "dist/checksums.txt" \
               "dist/version.json" \
-              --title "XO Game $TAG" \
+              --title "Tik Tak Tok $TAG" \
               --notes-file "dist/release_notes.md" \
               $PRERELEASE_FLAG
           fi
