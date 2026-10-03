@@ -1,19 +1,19 @@
 {
   "$schema": "https://raw.githubusercontent.com/Mahfoud-Sa/tik-tak-to/main/schemas/version-manifest.schema.json",
   "schema_version": 1,
-  "name": "Tik Tak Tok",
-  "version": "3.0.1",
-  "tag_name": "v3.0.1",
+  "name": "Tik Tak Tok v3.0.2",
+  "version": "3.0.2",
+  "tag_name": "v3.0.2",
   "channel": "stable",
-  "published_at": "2026-10-02T08:06:34Z",
+  "published_at": "2026-10-03T10:59:23Z",
   "mandatory": false,
-  "release_notes": "## XO Game v3.0.1\n\n### Changes\nChanges since **v5.0.0**:\n* 3bbd6bc chore(release): bump version to 3.0.1 [skip ci]\n* 802fffb ci: add GitHub Actions workflow for release and update pipeline\n* cd876bc chore(release): bump version to 5.1.1 [skip ci]\n* 928e3b8 chore(release): bump version to 3.0.1 [skip ci]\n* bc511b2 ci: add release and update pipeline workflow\n* 73fc972 ci: add GitHub Actions workflow for release pipeline and requirements.txt\n* 1b5938f feat: add agent skills and release pipeline with updater features\n* 93dd593 feat: Initialize game project with core files, configuration, and PyInstaller build setup.\n",
-  "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v3.0.1",
+  "release_notes": "## Tik Tak Tok v3.0.2\n\n### Changes\nChanges since **v5.1.1**:\n* 9cb77cf chore: add compiled python cache for config module\n* d48f855 fix(ci): align release workflow artifact names with Tik Tak Tok rebranding\n* 0730107 chore(release): bump version to 3.0.2 [skip ci]\n* 1fc519f ignore compiled Python cache files\n* e6a9d29 feat(ui): replace language toggle button with combobox dropdown and streamline menubar\n* a8225e6 feat: rebrand project to Tik Tak Tok and لعبة XO across desktop, web, and patcher\n* 9d9cc1b feat(i18n): implement bidirectional RTL and LTR layout presentation (#7)\n* 8fd7e93 feat: add Arabic and English bilingual support and language switch button\n* 3ac5900 fix(ide): add ./game to extraPaths and provide fallback imports in test files\n* 10563ee feat(updater): implement in-app patcher, chunked download, and multiplayer lockout\n* 73683ef feat: add version history page along with stylesheet, internationalization, and release feed scripts\n* bac0dea feat: add web interface, design system, and documentation pages\n* 08315f6 feat: add documentation site, release pipeline workflow, and version management scripts\n* 8518203 chore(release): update public version manifest for v3.0.1 [skip ci]\n* 3bbd6bc chore(release): bump version to 3.0.1 [skip ci]\n* 802fffb ci: add GitHub Actions workflow for release and update pipeline\n",
+  "release_page_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/tag/v3.0.2",
   "platforms": {
     "windows": {
-      "file_name": "XO_Game-v3.0.1-windows-x64.zip",
-      "download_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v3.0.1/XO_Game-v3.0.1-windows-x64.zip",
-      "sha256": "f62675d20c6b2873924be98c20d0749d1ac5aac655ebb7a0a15291234efec81a"
+      "file_name": "Tik_Tak_Tok-v3.0.2-windows-x64.zip",
+      "download_url": "https://github.com/Mahfoud-Sa/tik-tak-to/releases/download/v3.0.2/Tik_Tak_Tok-v3.0.2-windows-x64.zip",
+      "sha256": "0be63c7aaeb437cd59fb7ef6ca87bebefd2936c7f7574b283791e7c117359a0c"
     }
   }
 }
