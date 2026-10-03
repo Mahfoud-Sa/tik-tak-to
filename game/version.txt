@@ -1,7 +1,7 @@
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(3, 0, 1, 0),
-    prodvers=(3, 0, 1, 0),
+    filevers=(3, 0, 2, 0),
+    prodvers=(3, 0, 2, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x4,
@@ -16,12 +16,12 @@ VSVersionInfo(
         u'040904b0',
         [StringStruct(u'CompanyName', u'Mahfoud'),
         StringStruct(u'FileDescription', u'Tik Tak Tok'),
-        StringStruct(u'FileVersion', u'3.0.1'),
+        StringStruct(u'FileVersion', u'3.0.2'),
         StringStruct(u'InternalName', u'Tik Tak Tok'),
         StringStruct(u'LegalCopyright', u'Copyright (c) 2026'),
         StringStruct(u'OriginalFilename', u'Tik Tak Tok.exe'),
         StringStruct(u'ProductName', u'Tik Tak Tok'),
-        StringStruct(u'ProductVersion', u'3.0.1')])
+        StringStruct(u'ProductVersion', u'3.0.2')])
       ]), 
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]
